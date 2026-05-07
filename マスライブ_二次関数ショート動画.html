@@ -2,857 +2,550 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>マスライブ 二次関数ショート動画</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>二次関数の最大・最小値の求め方</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg-page: #ebe7d9;
-    --bg-stage: #fdfcf6;
-    --bg-card: #f3f0e3;
-    --line-grid: #d6d2c2;
-    --line-axis: #b8b3a0;
-    --green: #0F6E56;
-    --green-light: #5DCAA5;
-    --red: #D85A30;
-    --red-light: #F0997B;
-    --blue: #534AB7;
-    --blue-light: #7F77DD;
-    --amber: #BA7517;
-    --amber-bg: #FAEEDA;
-    --cool-bg: #E1F5EE;
-    --text-pri: #1a1a1a;
-    --text-sec: #5f5e5a;
-    --text-muted: #888780;
-  }
-  html, body { height: 100%; }
-  body {
-    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
-    background: var(--bg-page);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 20px;
-    padding: 32px 16px;
-    color: var(--text-pri);
-  }
-  .stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-  .stage {
-    width: 360px;
-    height: 640px;
-    background: var(--bg-stage);
-    border-radius: 18px;
-    box-shadow: 0 16px 50px rgba(60,50,30,0.18), 0 2px 6px rgba(60,50,30,0.06);
-    overflow: hidden;
-    position: relative;
-  }
-  .scene {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.35s ease;
-    pointer-events: none;
-  }
-  .scene.active { opacity: 1; }
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg-page:#c8dff0;--bg-stage:#daeefa;--white:#ffffff;--card:#f0f8ff;
+  --line:#b8d4e8;--text:#111;--text-sec:#444;--text-mut:#888;
+  --red:#C83030;--blue:#1848C0;--green:#1a7858;--amber:#a05800;
+  --cap-bg:#000;--cap-txt:#FFE94A;
+}
+html,body{height:100%;}
+body{
+  font-family:"Noto Sans JP",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  background:var(--bg-page);min-height:100vh;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:14px;padding:24px 16px 36px;color:var(--text);
+}
+.stage-wrap{display:flex;flex-direction:column;align-items:center;}
+.stage{
+  width:360px;height:640px;background:var(--bg-stage);border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,60,120,0.25),0 0 0 1px rgba(255,255,255,0.5);
+  overflow:hidden;position:relative;
+}
+.scene{position:absolute;inset:0;opacity:0;transition:opacity 0.35s ease;pointer-events:none;}
+.scene.active{opacity:1;}
+.top-caption{
+  position:absolute;top:0;left:0;right:0;background:var(--cap-bg);color:var(--cap-txt);
+  padding:10px 16px;text-align:center;font-weight:900;font-size:15px;line-height:1.35;
+  min-height:54px;z-index:80;display:flex;align-items:center;justify-content:center;
+  text-shadow:-1.5px -1.5px 0 #000,1.5px -1.5px 0 #000,-1.5px 1.5px 0 #000,1.5px 1.5px 0 #000;
+}
+.top-caption.sm{font-size:11.5px;}
+.scene-dots{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:90;}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(0,60,120,0.18);transition:all 0.3s;}
+.dot.active-dot{background:#0050c8;width:14px;border-radius:3px;}
+.channel-bar{
+  width:360px;background:var(--bg-stage);border-radius:0 0 20px 20px;
+  border:1px solid rgba(255,255,255,0.6);border-top:none;
+  padding:11px 16px 13px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 20px rgba(0,60,120,0.12);position:relative;
+}
+.channel-bar .ep-title{position:absolute;bottom:100%;left:16px;margin-bottom:5px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;padding:3px 8px;border-radius:6px;}
+.channel-bar .handle{font-size:13px;font-weight:700;}
+.channel-bar .sub-btn{margin-left:auto;background:var(--white);font-size:11px;font-weight:700;padding:7px 16px;border-radius:20px;border:1px solid var(--line);flex-shrink:0;}
+.fi{opacity:0;transition:opacity 0.4s ease,transform 0.4s cubic-bezier(0.34,1.56,0.64,1);transform:translateY(8px);}
+.scene.active .fi.show{opacity:1;transform:translateY(0);}
+.controls{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--line);padding:10px 14px;border-radius:30px;box-shadow:0 4px 16px rgba(0,60,120,0.1);width:360px;}
+.controls button{border:1px solid var(--line);background:var(--card);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.controls button:hover{background:#daeefa;}
+.progress{flex:1;height:4px;background:var(--line);border-radius:2px;cursor:pointer;overflow:hidden;}
+.progress-fill{height:100%;background:#0050c8;border-radius:2px;width:0%;}
+.time{font-size:11px;color:var(--text-mut);min-width:56px;text-align:right;font-variant-numeric:tabular-nums;}
+.footnote{font-size:11px;color:#6688aa;text-align:center;max-width:360px;line-height:1.6;}
+.content{position:absolute;top:54px;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:12px 16px 22px;overflow:hidden;}
 
-  /* common scene parts */
-  .header-strip {
-    background: var(--bg-card);
-    color: var(--amber);
-    padding: 12px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    text-align: center;
-    letter-spacing: 0.04em;
-  }
-  .scene-sub {
-    text-align: center;
-    color: var(--text-sec);
-    font-size: 13px;
-    margin-top: 14px;
-  }
-  .caption {
-    position: absolute;
-    bottom: 24px;
-    left: 18px;
-    right: 18px;
-    background: var(--bg-card);
-    border-radius: 10px;
-    padding: 14px 16px;
-    text-align: center;
-  }
-  .caption .ttl { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
-  .caption .min { color: var(--blue); font-size: 13px; margin-top: 4px; }
-  .caption .max { color: var(--red); font-size: 13px; margin-top: 2px; }
+/* == NOTEBOOK HEADER == */
+.nb-header{font-size:14px;font-weight:900;margin-bottom:10px;}
+.nb-header .bracket{color:var(--text-mut);font-weight:400;}
+.nb-header.blue{color:var(--blue);}
+.nb-header.amber{color:var(--amber);}
+.nb-header.red{color:var(--red);}
 
-  /* Scene 01 */
-  .grid-2x2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 14px 14px 0;
-  }
-  .cell {
-    background: #fff;
-    border: 1px solid var(--line-grid);
-    border-radius: 8px;
-    padding: 6px;
-    aspect-ratio: 1 / 1;
-    position: relative;
-  }
-  .cell .eq { font-size: 9px; color: var(--text-muted); position: absolute; top: 6px; left: 8px; font-family: serif; }
-  .cell svg { width: 100%; height: 100%; }
-  .scene-01-bottom {
-    position: absolute;
-    bottom: 24px;
-    left: 18px;
-    right: 18px;
-    background: var(--bg-card);
-    border-radius: 10px;
-    padding: 16px;
-    text-align: center;
-  }
-  .scene-01-bottom .l1 { font-size: 14px; font-weight: 500; }
-  .scene-01-bottom .l1 b { color: var(--amber); }
-  .scene-01-bottom .l2 { font-size: 15px; font-weight: 500; color: var(--amber); margin-top: 10px; letter-spacing: 0.02em; }
+/* == LOGICAL CHAIN == */
+.chain{display:flex;flex-direction:column;}
+.chain-step{background:var(--white);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:12px;line-height:1.7;}
+.chain-step b{font-weight:900;}
+.chain-step.known{border-left:3px solid var(--text-mut);}
+.chain-step.insight{border-left:3px solid var(--green);background:rgba(26,120,88,0.04);}
+.chain-arrow-row{display:flex;align-items:center;gap:5px;padding:3px 5px;}
+.chain-arrow-row .arr{color:var(--text-mut);font-size:13px;}
+.chain-arrow-row .why{font-size:10px;color:var(--text-mut);}
+.chain-concl{margin-top:8px;background:rgba(160,88,0,0.08);border:1px solid rgba(160,88,0,0.22);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;color:var(--amber);line-height:1.7;}
 
-  /* Scene 02 - formula hook */
-  .hook-formula {
-    text-align: center;
-    margin-top: 70px;
-    font-family: "Times New Roman", serif;
-    font-size: 30px;
-    font-weight: 500;
-    color: var(--text-pri);
-    letter-spacing: 0.02em;
-  }
-  .hook-sub { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 10px; }
-  .explainer-block { margin: 36px 22px 0; }
-  .explainer-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    background: var(--bg-card);
-    border-radius: 10px;
-    margin-bottom: 10px;
-  }
-  .exp-key {
-    font-family: "Times New Roman", serif;
-    font-weight: 500;
-    font-size: 18px;
-    color: var(--text-pri);
-    flex-shrink: 0;
-    min-width: 84px;
-    text-align: center;
-  }
-  .exp-arrow { color: var(--amber); font-weight: 500; font-size: 16px; }
-  .exp-val { font-size: 14px; color: var(--text-pri); }
-  .exp-val b { color: var(--amber); font-weight: 500; }
-  .hook-tagline {
-    text-align: center;
-    margin-top: 36px;
-    color: var(--amber);
-    font-weight: 500;
-    line-height: 1.7;
-  }
-  .hook-tagline .a { font-size: 17px; }
-  .hook-tagline .b { font-size: 22px; margin: 6px 0; letter-spacing: 0.01em; }
+/* demo graph wrapper */
+.demo-wrap{background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:6px 0;}
+.demo-wrap svg{width:100%;display:block;}
 
-  /* Scene 03 - preview split */
-  .split-half {
-    height: 50%;
-    padding: 14px 18px;
-    position: relative;
-    overflow: hidden;
-  }
-  .split-half + .split-half { border-top: 1px dashed var(--line-grid); }
-  .split-title { font-size: 14px; font-weight: 500; }
-  .split-title .num { color: var(--amber); font-weight: 600; margin-right: 6px; }
-  .split-center {
-    position: absolute;
-    top: 50%; left: 0; right: 0;
-    transform: translateY(-50%);
-    text-align: center;
-    color: var(--amber);
-    font-size: 18px;
-    font-weight: 500;
-    pointer-events: none;
-  }
+/* == STRATEGY (方針) == */
+.strat-label{font-size:11.5px;font-weight:700;padding:6px 10px;background:var(--white);border-radius:8px;border:1px solid var(--line);margin-bottom:6px;}
+.strat-label b{color:var(--text);}
+.dual-graphs{display:flex;gap:7px;flex:1;}
+.dual-card{flex:1;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:6px 4px 6px;display:flex;flex-direction:column;}
+.dual-card .dc-cond{font-size:8.5px;font-weight:700;text-align:center;padding:2px 0 3px;color:var(--text-sec);line-height:1.5;}
+.dual-card svg{flex:1;width:100%;display:block;}
+.dual-card .dc-ans{margin-top:3px;padding:5px 5px;background:var(--card);border-radius:7px;font-family:"Times New Roman",serif;font-size:11.5px;font-weight:700;text-align:center;}
+.dual-card .dc-ans.blue{color:var(--blue);}
+.dual-card .dc-ans.red{color:var(--red);}
+.dual-card .dc-where{font-size:8.5px;color:var(--text-mut);text-align:center;margin-top:2px;}
 
-  /* Scenes 04-10 - graph */
-  .graph-wrap {
-    width: 100%;
-    height: calc(100% - 230px);
-    margin-top: 8px;
-  }
-  .graph-wrap svg { width: 100%; height: 100%; display: block; }
+/* == 情報の整理 == */
+.info-items{display:flex;flex-direction:column;gap:7px;}
+.info-item{display:flex;align-items:flex-start;gap:8px;background:var(--white);border-radius:9px;padding:9px 11px;border:1px solid var(--line);}
+.info-num{width:21px;height:21px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;margin-top:1px;}
+.info-num.g{background:rgba(26,120,88,0.1);color:var(--green);border:1px solid rgba(26,120,88,0.25);}
+.info-num.b{background:rgba(24,72,192,0.1);color:var(--blue);border:1px solid rgba(24,72,192,0.25);}
+.info-num.a{background:rgba(160,88,0,0.1);color:var(--amber);border:1px solid rgba(160,88,0,0.25);}
+.info-body{flex:1;font-size:12px;line-height:1.7;}
+.info-body b{font-weight:900;}
+.info-body .math{font-family:"Times New Roman",serif;font-style:italic;font-size:13.5px;font-weight:700;}
+.info-body .sub{display:block;font-size:10.5px;color:var(--text-sec);margin-top:1px;}
+.info-body .arr{color:var(--amber);font-weight:700;}
+.info-key{margin-top:8px;background:rgba(160,88,0,0.08);border:1px solid rgba(160,88,0,0.22);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;color:var(--amber);line-height:1.8;}
 
-  /* summary cards 07 / 11 */
-  .summary {
-    margin: 110px auto 0;
-    width: 280px;
-    background: #fff;
-    border: 1px solid var(--line-grid);
-    border-radius: 14px;
-    padding: 28px 16px;
-    text-align: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  }
-  .summary .row { padding: 8px 0; }
-  .summary .row + .row { border-top: 1px solid #efece0; }
-  .summary .lbl { font-size: 14px; color: var(--text-pri); font-weight: 500; }
-  .summary .val.max { color: var(--red); font-size: 16px; font-weight: 500; margin-top: 2px; }
-  .summary .val.min { color: var(--blue); font-size: 16px; font-weight: 500; margin-top: 2px; }
-  .same-note { text-align: center; margin-top: 14px; color: var(--amber); font-size: 13px; font-weight: 500; }
+/* == Scene 01 == */
+.hook-eyebrow{font-size:11px;font-weight:700;color:var(--red);letter-spacing:0.05em;margin-bottom:5px;}
+.hook-q{font-size:19px;font-weight:900;line-height:1.5;}
+.hook-problem{margin-top:11px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:12px 15px;}
+.hook-problem .hfunc{font-size:21px;font-weight:700;font-family:"Times New Roman",serif;font-style:italic;color:var(--green);text-align:center;margin:7px 0;}
+.hook-problem .hdomain{font-size:12px;color:var(--text-sec);}
+.hook-problem .hask{font-size:11px;color:var(--text-mut);margin-top:6px;border-top:1px solid var(--line);padding-top:6px;}
+.hook-note{margin-top:10px;font-size:12.5px;font-weight:500;color:var(--text-sec);line-height:1.8;}
+.hook-note b{color:var(--amber);font-weight:700;}
 
-  /* scene 12 - integration */
-  .integ-title { text-align: center; padding: 20px 16px 6px; font-size: 13px; color: var(--text-sec); }
-  .integ-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 6px 14px; }
-  .mini-card { background: #fff; border: 1px solid var(--line-grid); border-radius: 10px; padding: 8px; aspect-ratio: 0.85; position: relative; }
-  .mini-card .lbl { font-size: 10px; color: var(--text-muted); position: absolute; top: 6px; left: 8px; }
-  .mini-card svg { width: 100%; height: 100%; }
-  .integ-msg {
-    text-align: center;
-    color: var(--amber);
-    font-weight: 500;
-    margin-top: 22px;
-    line-height: 1.7;
-    padding: 0 18px;
-  }
-  .integ-msg .s1 { font-size: 15px; }
-  .integ-msg .s2 { font-size: 24px; margin: 4px 0; }
-  .integ-msg .s3 { font-size: 15px; }
-
-  /* scene 13 - CTA */
-  .cta {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 80px 24px 32px;
-    text-align: center;
-  }
-  .logo-circle {
-    width: 90px; height: 90px;
-    border: 2px solid var(--amber);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: serif;
-    font-size: 38px;
-    font-weight: 500;
-    color: var(--amber);
-  }
-  .logo-name { font-size: 11px; letter-spacing: 0.18em; color: var(--text-sec); margin-top: 10px; }
-  .cta-copy { font-size: 17px; font-weight: 500; margin-top: 28px; line-height: 1.6; color: var(--text-pri); }
-  .cta-button {
-    margin-top: 24px;
-    background: var(--amber);
-    color: #fff;
-    padding: 12px 28px;
-    border-radius: 22px;
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.04em;
-  }
-  .cta-foot { font-size: 11px; color: var(--text-muted); margin-top: 16px; letter-spacing: 0.04em; }
-
-  /* fade-in helper */
-  .fi { opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; transform: translateY(6px); }
-  .scene.active .fi.show { opacity: 1; transform: translateY(0); }
-
-  /* progress bar / controls */
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: var(--bg-stage);
-    padding: 10px 16px;
-    border-radius: 24px;
-    box-shadow: 0 2px 12px rgba(60,50,30,0.08);
-    width: 360px;
-  }
-  .controls button {
-    border: none;
-    background: var(--text-pri);
-    color: #fff;
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .controls button:hover { background: #2c2c2a; }
-  .progress {
-    flex: 1;
-    height: 4px;
-    background: var(--line-grid);
-    border-radius: 2px;
-    cursor: pointer;
-    position: relative;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--amber);
-    border-radius: 2px;
-    width: 0%;
-  }
-  .time { font-size: 12px; color: var(--text-sec); min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
-
-  .footnote { font-size: 11px; color: var(--text-muted); text-align: center; max-width: 380px; line-height: 1.5; }
+/* == Scene 07 まとめ == */
+.sum-block{margin-bottom:8px;}
+.sum-head{font-size:11px;font-weight:900;padding:5px 8px;border-radius:7px 7px 0 0;text-align:center;}
+.sum-head.min-h{background:var(--blue);color:#fff;}
+.sum-head.max-h{background:var(--red);color:#fff;}
+.sum-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:0 0 8px 8px;overflow:hidden;border:1px solid var(--line);border-top:none;}
+.sum-table th{background:#222;color:#fff;font-size:9px;font-weight:900;padding:6px 3px;text-align:center;border-bottom:1px solid #444;}
+.sum-table td{background:var(--white);font-size:11px;padding:8px 4px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--line);font-family:"Times New Roman",serif;}
+.sum-table tr:last-child td{border-bottom:none;}
+.sum-table td:first-child{font-family:"Noto Sans JP",sans-serif;font-size:10px;font-weight:700;color:var(--text-sec);border-right:1px solid var(--line);background:var(--card);width:34px;}
+.sum-table .val-blue{color:var(--blue);font-weight:700;}
+.sum-table .val-red{color:var(--red);font-weight:700;}
+.sum-insight{margin-top:8px;background:var(--white);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:11px;font-weight:700;line-height:2.0;}
+.sum-insight .red{color:var(--red);}
+.sum-insight .blue{color:var(--blue);}
+.sum-insight .note{font-size:10px;font-weight:400;color:var(--text-sec);}
 </style>
 </head>
 <body>
 
 <div class="stage-wrap">
-  <div class="stage" id="stage">
+<div class="stage" id="stage">
 
-    <!-- ================== Scene 01 ================== -->
-    <div class="scene" id="scene-01">
-      <div class="header-strip">まず：区間なしの場合</div>
-      <div class="scene-sub fi" data-show="0.3">頂点だけ見ればOK。</div>
-      <div class="grid-2x2" style="margin-top: 14px;">
-        <div class="cell fi" data-show="0.6">
-          <span class="eq">y = x²</span>
-          <svg viewBox="0 0 100 100">
-            <line x1="6" y1="86" x2="94" y2="86" stroke="#d6d2c2" stroke-width="0.5"/>
-            <path d="M 8 18 Q 50 100 92 18" stroke="#0F6E56" stroke-width="2" fill="none"/>
-            <circle cx="50" cy="86" r="4.5" fill="#534AB7"/>
-            <text x="50" y="78" text-anchor="middle" fill="#534AB7" font-size="9" font-weight="500">最小</text>
-          </svg>
-        </div>
-        <div class="cell fi" data-show="0.9">
-          <span class="eq">y = (x−p)²+q</span>
-          <svg viewBox="0 0 100 100">
-            <line x1="6" y1="86" x2="94" y2="86" stroke="#d6d2c2" stroke-width="0.5"/>
-            <path d="M 6 22 Q 65 96 94 32" stroke="#0F6E56" stroke-width="2" fill="none"/>
-            <circle cx="62" cy="78" r="4.5" fill="#534AB7"/>
-            <text x="62" y="70" text-anchor="middle" fill="#534AB7" font-size="9" font-weight="500">最小</text>
-          </svg>
-        </div>
-        <div class="cell fi" data-show="1.2">
-          <span class="eq">y = −x²</span>
-          <svg viewBox="0 0 100 100">
-            <line x1="6" y1="14" x2="94" y2="14" stroke="#d6d2c2" stroke-width="0.5"/>
-            <path d="M 8 82 Q 50 0 92 82" stroke="#0F6E56" stroke-width="2" fill="none"/>
-            <circle cx="50" cy="14" r="4.5" fill="#D85A30"/>
-            <text x="50" y="30" text-anchor="middle" fill="#D85A30" font-size="9" font-weight="500">最大</text>
-          </svg>
-        </div>
-        <div class="cell fi" data-show="1.5">
-          <span class="eq">y = −(x−p)²+q</span>
-          <svg viewBox="0 0 100 100">
-            <line x1="6" y1="14" x2="94" y2="14" stroke="#d6d2c2" stroke-width="0.5"/>
-            <path d="M 6 70 Q 60 -8 94 78" stroke="#0F6E56" stroke-width="2" fill="none"/>
-            <circle cx="58" cy="22" r="4.5" fill="#D85A30"/>
-            <text x="58" y="38" text-anchor="middle" fill="#D85A30" font-size="9" font-weight="500">最大</text>
-          </svg>
-        </div>
-      </div>
-      <div class="scene-01-bottom fi" data-show="2.4">
-        <div class="l1">区間がなければ、答えは <b>頂点だけ。</b></div>
-        <div class="l2 fi" data-show="3.4">でも、区間がつくと…？</div>
-      </div>
+<!-- ===== Scene 01: Hook ===== -->
+<div class="scene" id="scene-01">
+  <div class="content">
+    <div class="hook-eyebrow fi" data-show="0.1">よくあるつまずきポイント</div>
+    <div class="hook-q fi" data-show="0.4">二次関数の<br>最大・最小値の求め方</div>
+    <div class="hook-problem fi" data-show="1.4">
+      <div class="hdomain">a を正の定数とする。0 ≦ x ≦ a のとき</div>
+      <div class="hfunc">f(x) = x² − 4x + 5</div>
+      <div class="hask">の (1) 最小値　(2) 最大値 を求めよ</div>
     </div>
-
-    <!-- ================== Scene 02 ================== -->
-    <div class="scene" id="scene-02">
-      <div class="hook-formula fi" data-show="0.1">f(x) = (x − a)²</div>
-      <div class="explainer-block">
-        <div class="explainer-row fi" data-show="1.6">
-          <span class="exp-key">x − a</span>
-          <span class="exp-arrow">→</span>
-          <span class="exp-val">x と軸 a の <b>距離</b></span>
-        </div>
-        <div class="explainer-row fi" data-show="3.6">
-          <span class="exp-key">(x − a)²</span>
-          <span class="exp-arrow">→</span>
-          <span class="exp-val">距離の <b>2乗</b></span>
-        </div>
-      </div>
-      <div class="hook-tagline">
-        <div class="a fi" data-show="5.4">最大最小は、</div>
-        <div class="b fi" data-show="5.9">「軸との距離」</div>
-        <div class="a fi" data-show="6.4">だけで決まる。</div>
-      </div>
+    <div class="hook-note fi" data-show="3.2">
+      「頂点を見ればいい」では解けない。<br>
+      <b>a が変わると → 状況が変わるから。</b>
     </div>
-
-    <!-- ================== Scene 03 ================== -->
-    <div class="scene" id="scene-03">
-      <div class="split-half">
-        <div class="split-title"><span class="num">①</span>軸が動く</div>
-        <svg viewBox="0 0 320 220" style="width:100%; height: calc(100% - 22px); margin-top: 4px;">
-          <line x1="20" y1="170" x2="300" y2="170" stroke="#d6d2c2" stroke-width="0.6"/>
-          <line x1="100" y1="170" x2="240" y2="170" stroke="#534AB7" stroke-width="6" stroke-linecap="round"/>
-          <circle cx="100" cy="170" r="4" fill="#534AB7"/>
-          <circle cx="240" cy="170" r="4" fill="#534AB7"/>
-          <line id="prev-axis-A" x1="160" y1="60" x2="160" y2="180" stroke="#D85A30" stroke-width="2" stroke-dasharray="6 4"/>
-        </svg>
-      </div>
-      <div class="split-half">
-        <div class="split-title"><span class="num">②</span>区間が動く</div>
-        <svg viewBox="0 0 320 220" style="width:100%; height: calc(100% - 22px); margin-top: 4px;">
-          <line x1="20" y1="170" x2="300" y2="170" stroke="#d6d2c2" stroke-width="0.6"/>
-          <line x1="160" y1="60" x2="160" y2="180" stroke="#D85A30" stroke-width="2" stroke-dasharray="6 4"/>
-          <line id="prev-int-B" x1="80" y1="170" x2="220" y2="170" stroke="#534AB7" stroke-width="6" stroke-linecap="round"/>
-          <circle id="prev-int-Bl" cx="80" cy="170" r="4" fill="#534AB7"/>
-          <circle id="prev-int-Br" cx="220" cy="170" r="4" fill="#534AB7"/>
-        </svg>
-      </div>
-      <div class="split-center fi" data-show="0.5">ルールは同じ。</div>
-    </div>
-
-    <!-- ================== Scenes 04-06 - Part A ================== -->
-    <div class="scene" id="scene-04">
-      <div class="header-strip">Part A : 軸が動く</div>
-      <div class="scene-sub">f(x) = (x − a)² ／ 0 ≤ x ≤ 2</div>
-      <div class="graph-wrap"><svg id="svg-A" viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="caption fi" data-show="0.4">
-        <div class="ttl">軸が区間の左にある</div>
-        <div class="min">最小：近い端 x = 0　値 a²</div>
-        <div class="max">最大：遠い端 x = 2　値 (2−a)²</div>
-      </div>
-    </div>
-    <div class="scene" id="scene-05">
-      <div class="header-strip">Part A : 軸が動く</div>
-      <div class="scene-sub">a が区間内をスライド</div>
-      <div class="graph-wrap"><svg id="svg-A2" viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="caption">
-        <div class="ttl">軸が区間内に入った</div>
-        <div class="min">最小：頂点 x = a（値 0）</div>
-        <div class="max">最大：軸から <b>遠い端</b></div>
-      </div>
-    </div>
-    <div class="scene" id="scene-06">
-      <div class="header-strip">Part A : 軸が動く</div>
-      <div class="scene-sub">a > 2 へ抜ける</div>
-      <div class="graph-wrap"><svg id="svg-A3" viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="caption fi" data-show="0.3">
-        <div class="ttl">軸が区間の右にある</div>
-        <div class="min">最小：近い端 x = 2　値 (2−a)²</div>
-        <div class="max">最大：遠い端 x = 0　値 a²</div>
-      </div>
-    </div>
-
-    <!-- ================== Scene 07 - Part A summary ================== -->
-    <div class="scene" id="scene-07">
-      <div class="header-strip">Part A まとめ</div>
-      <div class="summary fi" data-show="0.1">
-        <div class="row">
-          <div class="lbl">最大</div>
-          <div class="val max">＝ 遠い端</div>
-        </div>
-        <div class="row">
-          <div class="lbl">最小</div>
-          <div class="val min">＝ 近い端 or 頂点</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ================== Scenes 08-10 - Part B ================== -->
-    <div class="scene" id="scene-08">
-      <div class="header-strip">Part B : 区間が動く</div>
-      <div class="scene-sub">f(x) = x² ／ t−1 ≤ x ≤ t+1</div>
-      <div class="graph-wrap"><svg id="svg-B" viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="caption fi" data-show="0.4">
-        <div class="ttl">区間が軸の左に外れた</div>
-        <div class="min">最小：近い右端 x = t+1</div>
-        <div class="max">最大：遠い左端 x = t−1</div>
-      </div>
-    </div>
-    <div class="scene" id="scene-09">
-      <div class="header-strip">Part B : 区間が動く</div>
-      <div class="scene-sub">軸が区間に飲み込まれる</div>
-      <div class="graph-wrap"><svg id="svg-B2" viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="caption">
-        <div class="ttl">軸が区間内</div>
-        <div class="min">最小：頂点 x = 0</div>
-        <div class="max">最大：軸から <b>遠い端</b></div>
-      </div>
-    </div>
-    <div class="scene" id="scene-10">
-      <div class="header-strip">Part B : 区間が動く</div>
-      <div class="scene-sub">区間が右に抜ける</div>
-      <div class="graph-wrap"><svg id="svg-B3" viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet"></svg></div>
-      <div class="caption fi" data-show="0.3">
-        <div class="ttl">区間が軸の右に外れた</div>
-        <div class="min">最小：近い左端 x = t−1</div>
-        <div class="max">最大：遠い右端 x = t+1</div>
-      </div>
-    </div>
-
-    <!-- ================== Scene 11 - Part B summary ================== -->
-    <div class="scene" id="scene-11">
-      <div class="header-strip">Part B まとめ</div>
-      <div class="summary fi" data-show="0.1">
-        <div class="row">
-          <div class="lbl">最大</div>
-          <div class="val max">＝ 遠い端</div>
-        </div>
-        <div class="row">
-          <div class="lbl">最小</div>
-          <div class="val min">＝ 近い端 or 頂点</div>
-        </div>
-      </div>
-      <div class="same-note fi" data-show="0.6">…さっきと同じ。</div>
-    </div>
-
-    <!-- ================== Scene 12 - Integration ================== -->
-    <div class="scene" id="scene-12">
-      <div class="integ-title">動くのが軸でも区間でも</div>
-      <div class="integ-grid">
-        <div class="mini-card">
-          <span class="lbl">軸が動く</span>
-          <svg viewBox="0 0 100 100">
-            <line x1="6" y1="78" x2="94" y2="78" stroke="#d6d2c2" stroke-width="0.5"/>
-            <line x1="30" y1="78" x2="80" y2="78" stroke="#534AB7" stroke-width="3" stroke-linecap="round"/>
-            <line id="m12-axA" x1="50" y1="20" x2="50" y2="84" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="3 2"/>
-            <path d="M 6 26 Q 50 92 94 26" stroke="#0F6E56" stroke-width="1.5" fill="none"/>
-          </svg>
-        </div>
-        <div class="mini-card">
-          <span class="lbl">区間が動く</span>
-          <svg viewBox="0 0 100 100">
-            <line x1="6" y1="78" x2="94" y2="78" stroke="#d6d2c2" stroke-width="0.5"/>
-            <line x1="50" y1="20" x2="50" y2="84" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="3 2"/>
-            <line id="m12-intB" x1="30" y1="78" x2="70" y2="78" stroke="#534AB7" stroke-width="3" stroke-linecap="round"/>
-            <path d="M 6 22 Q 50 96 94 22" stroke="#0F6E56" stroke-width="1.5" fill="none"/>
-          </svg>
-        </div>
-      </div>
-      <div class="integ-msg">
-        <div class="s1 fi" data-show="0.3">見るのは</div>
-        <div class="s2 fi" data-show="0.7">「軸との距離」</div>
-        <div class="s3 fi" data-show="1.1">だけ。</div>
-      </div>
-    </div>
-
-    <!-- ================== Scene 13 - CTA ================== -->
-    <div class="scene" id="scene-13">
-      <div class="cta">
-        <div class="logo-circle fi" data-show="0.0">M</div>
-        <div class="logo-name fi" data-show="0.3">MATH LIVE</div>
-        <div class="cta-copy fi" data-show="0.7">軸を見抜く力、<br>塾でつけよう。</div>
-        <div class="cta-button fi" data-show="1.2">フォローはこちら</div>
-        <div class="cta-foot fi" data-show="1.6">＠math_live ／ 体験授業受付中</div>
-      </div>
-    </div>
-
   </div>
-
-  <div class="controls">
-    <button id="play-pause" aria-label="再生／一時停止">⏸</button>
-    <button id="sound" aria-label="音声 ON/OFF" style="font-size:11px; width:auto; padding:0 12px; border-radius:18px; height:36px;">音 OFF</button>
-    <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
-    <div class="time" id="time">0:00 / 1:00</div>
-  </div>
-
-  <div class="footnote">ブラウザで開けば自動再生（ループ）。「音 ON」ボタンを押すと日本語ナレーションが各カットで再生されます（ブラウザ標準の音声合成）。<br>画面録画で MP4 等に書き出して SNS 投稿に使えます。</div>
 </div>
+
+<!-- ===== Scene 02: [情報の整理] ===== -->
+<div class="scene" id="scene-02">
+  <div class="content">
+    <div class="nb-header fi" data-show="0.0"><span class="bracket">[</span>情報の整理<span class="bracket">]</span></div>
+    <div class="info-items">
+      <div class="info-item fi" data-show="0.5">
+        <div class="info-num g">①</div>
+        <div class="info-body"><b>求めたいもの</b>：最大値と最小値</div>
+      </div>
+      <div class="info-item fi" data-show="1.5">
+        <div class="info-num b">②</div>
+        <div class="info-body">
+          <b>与えられてるもの</b>
+          <span class="sub">
+            <span class="arr">f(x)</span> → 形が定まる（軸・向き）<br>
+            <span class="arr">区間</span> → 端点の数値（0 と a）
+          </span>
+        </div>
+      </div>
+      <div class="info-item fi" data-show="2.8">
+        <div class="info-num a">③</div>
+        <div class="info-body">
+          上に開く。軸 <span class="math">x = 2</span>、頂点 <span class="math">(2, 1)</span><br>
+          <b>a が動く</b> → 場合分けが変わる
+        </div>
+      </div>
+    </div>
+    <div class="info-key fi" data-show="4.0">
+      ①・②・③ を頭に入れて、<br>最小と最大を<b>別々に連想する</b>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 03: [連想] 最小 ===== -->
+<div class="scene" id="scene-03">
+  <div class="content">
+    <div class="nb-header blue fi" data-show="0.0"><span class="bracket">[</span>連想すること<span class="bracket">]</span>　― 最小について</div>
+    <div class="chain">
+      <div class="chain-step known fi" data-show="0.4">
+        よくある基本形：区間なし<br>
+        → 上に開く放物線の <b>頂点 = min（常に）</b>
+      </div>
+      <div class="chain-arrow-row fi" data-show="1.2"><span class="arr">↓</span><span class="why">なぜ？</span></div>
+      <div class="chain-step insight fi" data-show="1.4">
+        上に開く → <b>軸に近いほど最小</b><br>
+        <span style="font-size:11px;color:var(--text-sec);">だから a が動くと最小点が変わる</span>
+      </div>
+    </div>
+    <div class="demo-wrap fi" data-show="2.2">
+      <svg id="svg-min-demo" viewBox="0 0 320 148" style="display:block;width:100%;"></svg>
+    </div>
+    <div class="chain-concl fi" data-show="2.4">
+      軸 x=2 が端点 a と一致 → <b>a = 2 が境界</b>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 04: [方針の立案] 最小 ===== -->
+<div class="scene" id="scene-04">
+  <div class="content">
+    <div class="nb-header amber fi" data-show="0.0"><span class="bracket">[</span>方針の立案<span class="bracket">]</span>　― 最小値</div>
+    <div class="strat-label fi" data-show="0.3">
+      <b>軸と区間の位置関係</b>を整理 → 境界 a = 2
+    </div>
+    <div class="dual-graphs">
+      <div class="dual-card fi" data-show="0.7">
+        <div class="dc-cond">0 &lt; a ≦ 2<br>軸が区間の外<br>端点 x=a が最小</div>
+        <svg id="svg-min1" viewBox="0 0 158 148"></svg>
+        <div class="dc-ans blue">a²−4a+5</div>
+        <div class="dc-where">f(a)　x=a（右端）</div>
+      </div>
+      <div class="dual-card fi" data-show="4.5">
+        <div class="dc-cond">a &gt; 2<br>軸が区間の内<br>頂点 x=2 が最小</div>
+        <svg id="svg-min2" viewBox="0 0 158 148"></svg>
+        <div class="dc-ans blue">1</div>
+        <div class="dc-where">f(2)　x=2（頂点）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 05: [連想] 最大 ===== -->
+<div class="scene" id="scene-05">
+  <div class="content">
+    <div class="nb-header red fi" data-show="0.0"><span class="bracket">[</span>連想すること<span class="bracket">]</span>　― 最大について</div>
+    <div class="chain">
+      <div class="chain-step known fi" data-show="0.4">
+        よくある基本形：区間なし<br>
+        → 上に開く放物線の <b>端点のどちらかが max</b>
+      </div>
+      <div class="chain-arrow-row fi" data-show="1.2"><span class="arr">↓</span><span class="why">なぜ？</span></div>
+      <div class="chain-step insight fi" data-show="1.4">
+        上に開く → <b>軸から遠いほど最大</b><br>
+        <span style="font-size:11px;color:var(--text-sec);">|0−2|=2 　vs　|a−2|=a−2 を比べる</span>
+      </div>
+    </div>
+    <div class="demo-wrap fi" data-show="2.2">
+      <svg id="svg-max-demo" viewBox="0 0 320 148" style="display:block;width:100%;"></svg>
+    </div>
+    <div class="chain-concl fi" data-show="2.4">
+      a−2 = 2 のとき逆転 → <b>a = 4 が境界</b>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 06: [方針の立案] 最大 ===== -->
+<div class="scene" id="scene-06">
+  <div class="content">
+    <div class="nb-header amber fi" data-show="0.0"><span class="bracket">[</span>方針の立案<span class="bracket">]</span>　― 最大値</div>
+    <div class="strat-label fi" data-show="0.3">
+      <b>軸からの距離</b>で整理 → 境界 a = 4
+    </div>
+    <div class="dual-graphs">
+      <div class="dual-card fi" data-show="0.7">
+        <div class="dc-cond">0 &lt; a ≦ 4<br>x=0 が軸から遠い<br>左端 x=0 が最大</div>
+        <svg id="svg-max1" viewBox="0 0 158 148"></svg>
+        <div class="dc-ans red">5</div>
+        <div class="dc-where">f(0)　x=0（左端）</div>
+      </div>
+      <div class="dual-card fi" data-show="4.0">
+        <div class="dc-cond">a &gt; 4<br>x=a が軸から遠い<br>右端 x=a が最大</div>
+        <svg id="svg-max2" viewBox="0 0 158 148"></svg>
+        <div class="dc-ans red">a²−4a+5</div>
+        <div class="dc-where">f(a)　x=a（右端）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 07: まとめ ===== -->
+<div class="scene" id="scene-07">
+  <div class="content">
+    <div class="nb-header fi" data-show="0.0"><span class="bracket">[</span>まとめ<span class="bracket">]</span></div>
+    <div class="sum-block fi" data-show="0.3">
+      <div class="sum-head min-h">(1) 最小値　― 軸と区間の位置関係　境界 a = 2</div>
+      <table class="sum-table">
+        <thead><tr><th>　</th><th>0 &lt; a ≦ 2</th><th>a &gt; 2</th></tr></thead>
+        <tbody>
+          <tr><td>x</td><td>a（右端）</td><td>2（頂点）</td></tr>
+          <tr><td>値</td><td class="val-blue">a²−4a+5</td><td class="val-blue">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sum-block fi" data-show="1.2">
+      <div class="sum-head max-h">(2) 最大値　― 軸からの距離　境界 a = 4</div>
+      <table class="sum-table">
+        <thead><tr><th>　</th><th>0 &lt; a ≦ 4</th><th>a &gt; 4</th></tr></thead>
+        <tbody>
+          <tr><td>x</td><td>0（左端）</td><td>a（右端）</td></tr>
+          <tr><td>値</td><td class="val-red">5</td><td class="val-red">a²−4a+5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sum-insight fi" data-show="2.2">
+      <span class="blue">最小</span>：軸に近いほど小 → 境界 a = 2<br>
+      <span class="red">最大</span>：軸から遠いほど大 → 境界 a = 4<br>
+      <span class="note">「軸との距離」が連想の軸になる</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /stage -->
+<div class="channel-bar" id="channel-bar">
+  <span class="ep-title">定義域つき二次関数</span>
+  <span class="handle">@math_live</span>
+  <span class="sub-btn">チャンネル登録</span>
+</div>
+</div><!-- /stage-wrap -->
+
+<audio id="bgm" src="BGM.mp3" loop></audio>
+
+<div class="controls">
+  <button id="play-pause">⏸</button>
+  <button id="sound" style="font-size:11px;width:auto;padding:0 12px;border-radius:18px;height:36px;">音 OFF</button>
+  <button id="bgm-btn" style="font-size:11px;width:auto;padding:0 12px;border-radius:18px;height:36px;">BGM OFF</button>
+  <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
+  <span class="time" id="time">0:00 / 1:00</span>
+</div>
+<p class="footnote">ブラウザで自動再生。BGM ON → 画面録画でBGMごと収録。</p>
 
 <script>
 (function(){
-  const TOTAL = 60;
+  const TOTAL=60;
 
-  /* ---- Narration (台本) ---- */
-  const narrations = {
-    'scene-01': '区間がなければ、頂点を見るだけ。でも、区間がついたら？',
-    'scene-02': 'f(x) は、x と軸 a の距離を 2乗 した値。だから、軸から遠いほど値は大きく、近いほど小さい。',
-    'scene-03': '軸が動く場合と、区間が動く場合。',
-    'scene-04': '軸が区間の左にあれば、最小は近い端、最大は遠い端。',
-    'scene-05': '軸が区間内に入ると、最小は頂点。最大は、軸から遠い側の端。',
-    'scene-06': '軸が右でも同じ。近い端が最小、遠い端が最大。',
-    'scene-07': '最大は遠い、最小は近いか頂点。',
-    'scene-08': '区間が軸の左にあれば、近い端が最小、遠い端が最大。',
-    'scene-09': '区間が軸を含むと、最小は頂点。最大は、軸から遠い側の端。',
-    'scene-10': '区間が右なら、近い端が最小、遠い端が最大。',
-    'scene-11': 'ほら、さっきと同じ。',
-    'scene-12': '動くのが軸でも区間でも、距離だけ。',
-    'scene-13': 'マスライブで、軸を見抜く力を。',
-  };
+  /* ============ GRAPH DRAW ============ */
+  function fv(x){return (x-2)*(x-2)+1;}
 
-  let voiceEnabled = false;
-  let lastSpoken = null;
-  let jaVoice = null;
-
-  function pickJaVoice(){
-    if(!('speechSynthesis' in window)) return null;
-    const voices = speechSynthesis.getVoices();
-    return voices.find(v => v.lang && (v.lang === 'ja-JP' || v.lang.startsWith('ja'))) || null;
+  /**
+   * Draw animated graph into an SVG element.
+   * Outside [0,aVal] → dashed; inside → solid.
+   * cfg: {xMaxV, yMaxV, gx, gy, gw, gh}
+   */
+  function drawGraphFrame(svgEl, aVal, showMin, cfg){
+    const {xMaxV,yMaxV,gx,gy,gw,gh}=cfg;
+    const xMin=-0.3, yMin=-0.3;
+    const px=x=>gx+(x-xMin)/(xMaxV-xMin)*gw;
+    const py=y=>gy+gh-(y-yMin)/(yMaxV-yMin)*gh;
+    const yz=py(0);
+    let h='';
+    // grid
+    for(let xi=0;xi<=Math.floor(xMaxV);xi++){
+      const xp=px(xi);if(xp<gx-2||xp>gx+gw+2)continue;
+      h+=`<line x1="${xp}" y1="${gy}" x2="${xp}" y2="${yz+3}" stroke="#c0d8ec" stroke-width="0.7"/>`;
+      h+=`<text x="${xp}" y="${yz+13}" text-anchor="middle" fill="#7799bb" font-size="9">${xi}</text>`;
+    }
+    const yst=yMaxV>8?3:2;
+    for(let yi=0;yi<=yMaxV;yi+=yst){
+      const yp=py(yi);
+      h+=`<line x1="${gx-2}" y1="${yp}" x2="${gx+gw}" y2="${yp}" stroke="#c0d8ec" stroke-width="0.7"/>`;
+      if(yi>0)h+=`<text x="${gx-4}" y="${yp+3}" text-anchor="end" fill="#7799bb" font-size="9">${yi}</text>`;
+    }
+    h+=`<line x1="${gx}" y1="${yz}" x2="${gx+gw}" y2="${yz}" stroke="#6888aa" stroke-width="1.1"/>`;
+    // interval
+    const ix0=px(0),ixa=px(aVal);
+    h+=`<line x1="${ix0}" y1="${yz}" x2="${ixa}" y2="${yz}" stroke="#1848C0" stroke-width="6" stroke-linecap="round" opacity="0.4"/>`;
+    h+=`<circle cx="${ix0}" cy="${yz}" r="3.5" fill="#1848C0" stroke="#daeefa" stroke-width="1.2"/>`;
+    h+=`<circle cx="${ixa}" cy="${yz}" r="3.5" fill="#1848C0" stroke="#daeefa" stroke-width="1.2"/>`;
+    h+=`<text x="${ix0}" y="${yz+13}" text-anchor="middle" fill="#1848C0" font-size="9" font-weight="700">0</text>`;
+    h+=`<text x="${ixa}" y="${yz+13}" text-anchor="middle" fill="#1848C0" font-size="9" font-weight="700">a</text>`;
+    // parabola: outside dashed, inside solid
+    let pIn='',pOutL='',pOutR='';
+    for(let x=xMin;x<=xMaxV;x+=0.02){
+      const y=fv(x);if(y<yMin||y>yMaxV)continue;
+      const coord=`${px(x).toFixed(1)},${py(y).toFixed(1)}`;
+      if(x>=0&&x<=aVal){pIn+=(pIn?'L':'M')+coord;}
+      else if(x<0){pOutL+=(pOutL?'L':'M')+coord;}
+      else{pOutR+=(pOutR?'L':'M')+coord;}
+    }
+    if(pOutL)h+=`<path d="${pOutL}" stroke="#aac8dc" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>`;
+    if(pIn)  h+=`<path d="${pIn}"  stroke="#1a7858" stroke-width="2.5" fill="none"/>`;
+    if(pOutR)h+=`<path d="${pOutR}" stroke="#aac8dc" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>`;
+    // axis x=2
+    if(px(2)>gx&&px(2)<gx+gw){
+      h+=`<line x1="${px(2)}" y1="${gy}" x2="${px(2)}" y2="${yz+4}" stroke="#C83030" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+      h+=`<text x="${px(2)}" y="${gy-2}" text-anchor="middle" fill="#C83030" font-size="9" font-weight="700">x=2</text>`;
+    }
+    // highlight min/max — skip dot if out of visible range
+    let hx,hy,col;
+    if(showMin){hx=aVal<=2?aVal:2;col='#1848C0';}
+    else{hx=aVal<=4?0:aVal;col='#C83030';}
+    hy=fv(hx);
+    if(hy<=yMaxV&&hx>=xMin&&hx<=xMaxV){
+      const hpx=px(hx),hpy=py(hy);
+      const lbl=showMin?'最小':'最大';
+      const lblY=hpy-14<gy+4?hpy+17:hpy-11;
+      h+=`<circle cx="${hpx}" cy="${hpy}" r="7" fill="${col}" stroke="#daeefa" stroke-width="2"/>`;
+      h+=`<text x="${hpx}" y="${lblY}" text-anchor="middle" fill="${col}" font-size="10" font-weight="700">${lbl}</text>`;
+    }
+    svgEl.innerHTML=h;
   }
 
-  function speakScene(sceneId){
-    if(!voiceEnabled) return;
-    if(sceneId === lastSpoken) return;
-    lastSpoken = sceneId;
-    if(!('speechSynthesis' in window)) return;
-    const text = narrations[sceneId];
-    if(!text) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP';
-    u.rate = 1.0;
-    u.pitch = 1.0;
-    u.volume = 1.0;
-    if(jaVoice) u.voice = jaVoice;
-    speechSynthesis.speak(u);
-  }
+  // Animation configs for each graph
+  // phase: 0→2π, aVal = minA + (sin(phase)*0.5+0.5)*(maxA-minA)
+  const DEMO_CFG_MIN={xMaxV:5.5,yMaxV:9,  gx:32,gy:10,gw:242,gh:112};
+  const DEMO_CFG_MAX={xMaxV:6.5,yMaxV:12, gx:32,gy:10,gw:242,gh:112};
+  const DUAL_CFG   ={xMaxV:3.5,yMaxV:7,  gx:28,gy:8, gw:118,gh:108}; // overridden per card
 
-  if('speechSynthesis' in window){
-    speechSynthesis.onvoiceschanged = () => { jaVoice = pickJaVoice(); };
-    jaVoice = pickJaVoice();
-  }
-
-  const scenes = [
-    { id:'scene-01', s:0,  e:5  },
-    { id:'scene-02', s:5,  e:13 },
-    { id:'scene-03', s:13, e:16 },
-    { id:'scene-04', s:16, e:21 },
-    { id:'scene-05', s:21, e:28 },
-    { id:'scene-06', s:28, e:32 },
-    { id:'scene-07', s:32, e:35 },
-    { id:'scene-08', s:35, e:40 },
-    { id:'scene-09', s:40, e:47 },
-    { id:'scene-10', s:47, e:51 },
-    { id:'scene-11', s:51, e:53 },
-    { id:'scene-12', s:53, e:57 },
-    { id:'scene-13', s:57, e:60 },
+  const animGraphs=[
+    // Scene 03: min demo (a slides 0.4→4.8)
+    {id:'svg-min-demo', showMin:true,  cfg:DEMO_CFG_MIN, minA:0.4, maxA:4.8, phase:0,   spd:0.55},
+    // Scene 05: max demo (a slides 0.5→5.0, f(5)=10<yMaxV12)
+    {id:'svg-max-demo', showMin:false, cfg:DEMO_CFG_MAX, minA:0.5, maxA:5.0, phase:0,   spd:0.50},
+    // Scene 04: min dual cards
+    {id:'svg-min1',     showMin:true,  cfg:{xMaxV:3.0,yMaxV:7,gx:26,gy:8,gw:120,gh:108}, minA:0.3, maxA:1.95,phase:0,   spd:0.65},
+    {id:'svg-min2',     showMin:true,  cfg:{xMaxV:5.5,yMaxV:7,gx:26,gy:8,gw:120,gh:108}, minA:2.05,maxA:4.8, phase:Math.PI, spd:0.65},
+    // Scene 06: max dual cards
+    {id:'svg-max1',     showMin:false, cfg:{xMaxV:4.5,yMaxV:8,gx:26,gy:8,gw:120,gh:108}, minA:0.4, maxA:3.9, phase:0,   spd:0.60},
+    {id:'svg-max2',     showMin:false, cfg:{xMaxV:6.5,yMaxV:11,gx:26,gy:8,gw:120,gh:108},minA:4.05,maxA:4.8, phase:Math.PI, spd:0.60},
   ];
 
-  let t = 0;
-  let playing = true;
-  let last = performance.now();
-
-  /* ---- Coord helpers ---- */
-  // Part A: x ∈ [-1.2, 3.2], y ∈ [0, 7], graph area in 360x360 viewBox
-  const PA = { xMin:-1.2, xMax:3.2, yMin:0, yMax:7, gx:24, gy:24, gw:312, gh:280 };
-  function ax(x){ return PA.gx + (x - PA.xMin)/(PA.xMax - PA.xMin)*PA.gw; }
-  function ay(y){ return PA.gy + PA.gh - (y - PA.yMin)/(PA.yMax - PA.yMin)*PA.gh; }
-  function paraA(a){ // f(x) = (x-a)^2
-    let p='';
-    for(let x=PA.xMin; x<=PA.xMax; x+=0.04){
-      const y=(x-a)*(x-a);
-      if(y>PA.yMax) continue;
-      p += (p?'L':'M') + ax(x).toFixed(1) + ',' + ay(y).toFixed(1);
-    }
-    return p;
-  }
-
-  // Part B: x ∈ [-3, 3], y ∈ [0, 9]
-  const PB = { xMin:-3, xMax:3, yMin:0, yMax:9, gx:24, gy:24, gw:312, gh:280 };
-  function bx(x){ return PB.gx + (x - PB.xMin)/(PB.xMax - PB.xMin)*PB.gw; }
-  function by(y){ return PB.gy + PB.gh - (y - PB.yMin)/(PB.yMax - PB.yMin)*PB.gh; }
-  function paraB(){ // f(x) = x^2
-    let p='';
-    for(let x=PB.xMin; x<=PB.xMax; x+=0.04){
-      const y=x*x;
-      if(y>PB.yMax) continue;
-      p += (p?'L':'M') + bx(x).toFixed(1) + ',' + by(y).toFixed(1);
-    }
-    return p;
-  }
-
-  /* ---- Render helpers ---- */
-  function drawA(svgId, a, show){
-    const svg = document.getElementById(svgId);
-    if(!svg) return;
-    const yz = ay(0);
-    let h = '';
-    // baseline
-    h += `<line x1="${PA.gx}" y1="${yz}" x2="${PA.gx+PA.gw}" y2="${yz}" stroke="#d6d2c2" stroke-width="0.6"/>`;
-    // y-axis at x=0
-    h += `<line x1="${ax(0)}" y1="${PA.gy}" x2="${ax(0)}" y2="${yz+8}" stroke="#e8e3d0" stroke-width="0.5" stroke-dasharray="2 3"/>`;
-    // Interval [0, 2]
-    h += `<line x1="${ax(0)}" y1="${yz}" x2="${ax(2)}" y2="${yz}" stroke="#534AB7" stroke-width="6" stroke-linecap="round"/>`;
-    h += `<circle cx="${ax(0)}" cy="${yz}" r="5" fill="#534AB7"/>`;
-    h += `<circle cx="${ax(2)}" cy="${yz}" r="5" fill="#534AB7"/>`;
-    h += `<text x="${ax(0)}" y="${yz+22}" text-anchor="middle" fill="#534AB7" font-size="11">0</text>`;
-    h += `<text x="${ax(2)}" y="${yz+22}" text-anchor="middle" fill="#534AB7" font-size="11">2</text>`;
-    // parabola
-    h += `<path d="${paraA(a)}" stroke="#0F6E56" stroke-width="2.5" fill="none"/>`;
-    // axis vertical
-    h += `<line x1="${ax(a)}" y1="${PA.gy}" x2="${ax(a)}" y2="${yz+10}" stroke="#D85A30" stroke-width="2" stroke-dasharray="6 4"/>`;
-    h += `<text x="${ax(a)}" y="${PA.gy-4}" text-anchor="middle" fill="#D85A30" font-size="11">x = a</text>`;
-
-    // min / max
-    let mx, my, Mx, My;
-    if(a < 0){ mx=0; my=a*a; Mx=2; My=(2-a)*(2-a); }
-    else if(a > 2){ mx=2; my=(2-a)*(2-a); Mx=0; My=a*a; }
-    else { mx=a; my=0; if(a<1){ Mx=2; My=(2-a)*(2-a);} else { Mx=0; My=a*a;} }
-
-    if(My > PA.yMax) My = PA.yMax;
-    h += `<circle cx="${ax(Mx)}" cy="${ay(My)}" r="7" fill="#D85A30" stroke="#fdfcf6" stroke-width="2"/>`;
-    h += `<text x="${ax(Mx)}" y="${ay(My)-12}" text-anchor="middle" fill="#D85A30" font-size="12" font-weight="500">最大</text>`;
-    h += `<circle cx="${ax(mx)}" cy="${ay(my)}" r="7" fill="#534AB7" stroke="#fdfcf6" stroke-width="2"/>`;
-    h += `<text x="${ax(mx)+12}" y="${ay(my)+18}" fill="#534AB7" font-size="12" font-weight="500">最小</text>`;
-
-    svg.innerHTML = h;
-  }
-
-  function drawB(svgId, tval){
-    const svg = document.getElementById(svgId);
-    if(!svg) return;
-    const L = tval - 1, R = tval + 1;
-    const yz = by(0);
-    let h = '';
-    h += `<line x1="${PB.gx}" y1="${yz}" x2="${PB.gx+PB.gw}" y2="${yz}" stroke="#d6d2c2" stroke-width="0.6"/>`;
-    // axis x=0 (固定)
-    h += `<line x1="${bx(0)}" y1="${PB.gy}" x2="${bx(0)}" y2="${yz+10}" stroke="#D85A30" stroke-width="2" stroke-dasharray="6 4"/>`;
-    h += `<text x="${bx(0)}" y="${PB.gy-4}" text-anchor="middle" fill="#D85A30" font-size="11">x = 0 (固定)</text>`;
-    // parabola
-    h += `<path d="${paraB()}" stroke="#0F6E56" stroke-width="2.5" fill="none"/>`;
-    // interval
-    h += `<line x1="${bx(L)}" y1="${yz}" x2="${bx(R)}" y2="${yz}" stroke="#534AB7" stroke-width="6" stroke-linecap="round"/>`;
-    h += `<circle cx="${bx(L)}" cy="${yz}" r="5" fill="#534AB7"/>`;
-    h += `<circle cx="${bx(R)}" cy="${yz}" r="5" fill="#534AB7"/>`;
-    h += `<text x="${bx(L)}" y="${yz+22}" text-anchor="middle" fill="#534AB7" font-size="11">t−1</text>`;
-    h += `<text x="${bx(R)}" y="${yz+22}" text-anchor="middle" fill="#534AB7" font-size="11">t+1</text>`;
-
-    let mx, my, Mx, My;
-    if(tval <= -1){ mx=R; my=R*R; Mx=L; My=L*L; }
-    else if(tval >= 1){ mx=L; my=L*L; Mx=R; My=R*R; }
-    else { mx=0; my=0; if(tval < 0){ Mx=L; My=L*L;} else { Mx=R; My=R*R;} }
-    if(My>PB.yMax) My = PB.yMax;
-    h += `<circle cx="${bx(Mx)}" cy="${by(My)}" r="7" fill="#D85A30" stroke="#fdfcf6" stroke-width="2"/>`;
-    h += `<text x="${bx(Mx)}" y="${by(My)-12}" text-anchor="middle" fill="#D85A30" font-size="12" font-weight="500">最大</text>`;
-    h += `<circle cx="${bx(mx)}" cy="${by(my)}" r="7" fill="#534AB7" stroke="#fdfcf6" stroke-width="2"/>`;
-    h += `<text x="${bx(mx)+12}" y="${by(my)+18}" fill="#534AB7" font-size="12" font-weight="500">最小</text>`;
-    svg.innerHTML = h;
-  }
-
-  /* ---- Per-scene updaters ---- */
-  const updaters = {
-    'scene-03': (lt) => {
-      // axis swings; interval swings
-      const axis = document.getElementById('prev-axis-A');
-      if(axis){
-        const val = 160 + Math.sin(lt * 1.6) * 70;
-        axis.setAttribute('x1', val);
-        axis.setAttribute('x2', val);
-      }
-      const int = document.getElementById('prev-int-B');
-      const intl = document.getElementById('prev-int-Bl');
-      const intr = document.getElementById('prev-int-Br');
-      if(int){
-        const c = 160 + Math.sin(lt * 1.6 + Math.PI) * 50;
-        int.setAttribute('x1', c-70);
-        int.setAttribute('x2', c+70);
-        intl.setAttribute('cx', c-70);
-        intr.setAttribute('cx', c+70);
-      }
-    },
-    'scene-04': () => drawA('svg-A', -0.6, true),
-    'scene-05': (lt, dur) => {
-      // a swings inside [0, 2] back and forth slowly
-      const phase = lt / dur; // 0..1
-      // single sweep 0 → 2
-      const a = Math.min(2 * phase, 2);
-      drawA('svg-A2', a, true);
-    },
-    'scene-06': () => drawA('svg-A3', 2.7, true),
-    'scene-08': () => drawB('svg-B', -1.6),
-    'scene-09': (lt, dur) => {
-      const phase = lt / dur;
-      const tv = -1 + 2 * Math.min(phase, 1);
-      drawB('svg-B2', tv);
-    },
-    'scene-10': () => drawB('svg-B3', 1.6),
-    'scene-12': (lt) => {
-      const axA = document.getElementById('m12-axA');
-      const intB = document.getElementById('m12-intB');
-      if(axA){
-        const v = 50 + Math.sin(lt*2) * 22;
-        axA.setAttribute('x1', v); axA.setAttribute('x2', v);
-      }
-      if(intB){
-        const c = 50 + Math.sin(lt*2 + Math.PI) * 18;
-        intB.setAttribute('x1', c-20); intB.setAttribute('x2', c+20);
-      }
-    },
+  /* ============ SCENE / PLAYBACK ============ */
+  const narrations={
+    'scene-01':'二次関数の最大・最小値ってさ、aが変わると答えも変わるじゃん。どう解けばいいの？一緒に整理しよ。',
+    'scene-02':'まず情報の整理ね。①最大・最小を求める。②f(x)で形が決まって、端点は0とa。③上に開く、軸はx=2。aが動くから場合分けが変わるんだよ。',
+    'scene-03':'最小を連想してみて。区間なしなら頂点が最小じゃん。なんで？軸に近いほど小さくなるから。aが動くと最小点も変わるんだよ。境界はa=2。',
+    'scene-04':'最小の方針ね。軸と区間の位置関係で整理、境界はa=2。aが2以下なら端点x=aが最小でa²引く4a足す5。aが2より大きければ頂点x=2が最小、値は1。',
+    'scene-05':'最大を連想してみて。端点のどちらかが最大になるじゃん。なんで？軸から遠いほど大きくなるから。0とaの距離を比べると、境界はa=4なんだよ。',
+    'scene-06':'最大の方針ね。軸からの距離で整理、境界はa=4。aが4以下なら左端x=0が最大で値は5。aが4より大きければ右端x=aが最大。',
+    'scene-07':'最小は軸に近い側、最大は遠い側。軸との距離が全てのカギ。',
   };
+  const scenes=[
+    {id:'scene-01',s:0, e:8 },
+    {id:'scene-02',s:8, e:17},
+    {id:'scene-03',s:17,e:26},
+    {id:'scene-04',s:26,e:37},
+    {id:'scene-05',s:37,e:46},
+    {id:'scene-06',s:46,e:56},
+    {id:'scene-07',s:56,e:60},
+  ];
 
-  /* ---- Active scene & fi-show triggers ---- */
-  function setActive(sId, lt){
-    scenes.forEach(s => {
-      const el = document.getElementById(s.id);
-      if(!el) return;
-      const isActive = s.id === sId;
-      if(isActive && !el.classList.contains('active')){
-        el.classList.add('active');
-        // trigger fi-show timing
-        const fis = el.querySelectorAll('.fi');
-        fis.forEach(f => f.classList.remove('show'));
-      } else if(!isActive && el.classList.contains('active')){
-        el.classList.remove('active');
-      }
+  let t=0,playing=true,last=performance.now();
+  let voiceEnabled=false,lastSpoken=null,jaVoice=null;
+  let bgmEnabled=false;
+  const bgmEl=document.getElementById('bgm');
+  if(bgmEl)bgmEl.volume=0.18;
+  function pickJaVoice(){if(!('speechSynthesis' in window))return null;return speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('ja'))||null;}
+  function speakScene(id){
+    if(!voiceEnabled||id===lastSpoken)return;lastSpoken=id;
+    if(!('speechSynthesis' in window))return;speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(narrations[id]||'');
+    u.lang='ja-JP';u.rate=1.05;u.pitch=1.0;u.volume=1.0;if(jaVoice)u.voice=jaVoice;speechSynthesis.speak(u);
+  }
+  if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>{jaVoice=pickJaVoice();};jaVoice=pickJaVoice();}
+
+  function updateDots(activeId){
+    const el=document.getElementById('scene-dots');if(!el)return;
+    el.querySelectorAll('.dot').forEach((d,i)=>{d.classList.toggle('active-dot',scenes[i].id===activeId);});
+  }
+  const capTexts={
+    'scene-01':'二次関数の最大・最小値の求め方',
+    'scene-02':'[情報の整理]',
+    'scene-03':'[連想すること]　― 最小',
+    'scene-04':'[方針の立案]　― 最小値',
+    'scene-05':'[連想すること]　― 最大',
+    'scene-06':'[方針の立案]　― 最大値',
+    'scene-07':'[まとめ]',
+  };
+  function setActive(sId,lt){
+    scenes.forEach(s=>{
+      const el=document.getElementById(s.id);if(!el)return;
+      const active=s.id===sId;
+      if(active&&!el.classList.contains('active')){el.classList.add('active');el.querySelectorAll('.fi').forEach(f=>f.classList.remove('show'));}
+      else if(!active)el.classList.remove('active');
     });
-    // schedule fi shows based on data-show within active scene
-    const active = document.getElementById(sId);
-    if(active){
-      active.querySelectorAll('.fi').forEach(f => {
-        const show = parseFloat(f.dataset.show) || 0;
-        if(lt >= show) f.classList.add('show');
-        else f.classList.remove('show');
-      });
-    }
+    const active=document.getElementById(sId);
+    if(active)active.querySelectorAll('.fi').forEach(f=>{f.classList.toggle('show',lt>=(parseFloat(f.dataset.show)||0));});
+    const tc=document.getElementById('top-caption');
+    if(tc){const txt=capTexts[sId]||'\u3000';tc.textContent=txt;tc.className='top-caption'+(txt.length>=22?' sm':'');}
+    updateDots(sId);
   }
-
-  function fmt(x){
-    const m = Math.floor(x/60);
-    const s = Math.floor(x%60);
-    return m + ':' + (s<10?'0'+s:s);
-  }
+  function fmt(x){const m=Math.floor(x/60),s=Math.floor(x%60);return m+':'+(s<10?'0'+s:s);}
 
   function frame(now){
-    const dt = (now - last) / 1000;
-    last = now;
-    if(playing) t += dt;
-    if(t >= TOTAL) { t = 0; lastSpoken = null; if('speechSynthesis' in window) speechSynthesis.cancel(); }
+    const dt=(now-last)/1000;last=now;
+    if(playing)t+=dt;
+    if(t>=TOTAL){t=0;lastSpoken=null;if('speechSynthesis' in window)speechSynthesis.cancel();}
 
-    const cur = scenes.find(s => t >= s.s && t < s.e) || scenes[scenes.length-1];
-    const lt = t - cur.s;
-    setActive(cur.id, lt);
-    speakScene(cur.id);
-    if(updaters[cur.id]) updaters[cur.id](lt, cur.e - cur.s);
+    // Update animated graphs
+    animGraphs.forEach(g=>{
+      const svgEl=document.getElementById(g.id);if(!svgEl)return;
+      g.phase=(g.phase+dt*g.spd)%(2*Math.PI);
+      const aVal=g.minA+(Math.sin(g.phase)*0.5+0.5)*(g.maxA-g.minA);
+      drawGraphFrame(svgEl,aVal,g.showMin,g.cfg);
+    });
 
-    document.getElementById('progress-fill').style.width = (t/TOTAL*100) + '%';
-    document.getElementById('time').textContent = fmt(t) + ' / 1:00';
-
+    const cur=scenes.find(s=>t>=s.s&&t<s.e)||scenes[scenes.length-1];
+    setActive(cur.id,t-cur.s);speakScene(cur.id);
+    document.getElementById('progress-fill').style.width=(t/TOTAL*100)+'%';
+    document.getElementById('time').textContent=fmt(t)+' / 1:00';
     requestAnimationFrame(frame);
   }
 
-  /* ---- Controls ---- */
-  document.getElementById('play-pause').addEventListener('click', () => {
-    playing = !playing;
-    document.getElementById('play-pause').textContent = playing ? '⏸' : '⏵';
-    if(!playing && 'speechSynthesis' in window) speechSynthesis.pause();
-    else if(playing && 'speechSynthesis' in window) speechSynthesis.resume();
-  });
-  document.getElementById('sound').addEventListener('click', () => {
-    voiceEnabled = !voiceEnabled;
-    document.getElementById('sound').textContent = voiceEnabled ? '音 ON' : '音 OFF';
-    if(!voiceEnabled){
-      if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.getElementById('play-pause').addEventListener('click',()=>{
+    playing=!playing;document.getElementById('play-pause').textContent=playing?'⏸':'⏵';
+    if(!playing){
+      if('speechSynthesis' in window)speechSynthesis.pause();
+      if(bgmEnabled&&bgmEl)bgmEl.pause();
+    } else {
+      if('speechSynthesis' in window)speechSynthesis.resume();
+      if(bgmEnabled&&bgmEl)bgmEl.play();
     }
-    // re-trigger current scene's narration on toggle
-    lastSpoken = null;
-    if(!jaVoice) jaVoice = pickJaVoice();
   });
-  document.getElementById('progress').addEventListener('click', (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    t = (e.clientX - r.left) / r.width * TOTAL;
-    lastSpoken = null;
-    if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.getElementById('bgm-btn').addEventListener('click',()=>{
+    bgmEnabled=!bgmEnabled;
+    document.getElementById('bgm-btn').textContent=bgmEnabled?'BGM ON':'BGM OFF';
+    if(bgmEl){
+      if(bgmEnabled&&playing){bgmEl.currentTime=t%bgmEl.duration||0;bgmEl.play().catch(()=>{});}
+      else bgmEl.pause();
+    }
+  });
+  document.getElementById('sound').addEventListener('click',()=>{
+    voiceEnabled=!voiceEnabled;document.getElementById('sound').textContent=voiceEnabled?'音 ON':'音 OFF';
+    if(!voiceEnabled&&'speechSynthesis' in window)speechSynthesis.cancel();
+    lastSpoken=null;if(!jaVoice)jaVoice=pickJaVoice();
+  });
+  document.getElementById('progress').addEventListener('click',(e)=>{
+    const r=e.currentTarget.getBoundingClientRect();t=(e.clientX-r.left)/r.width*TOTAL;
+    lastSpoken=null;if('speechSynthesis' in window)speechSynthesis.cancel();
   });
 
-  // Pre-render static graph scenes (so they render even if not entered through animation)
-  drawA('svg-A', -0.6);
-  drawA('svg-A3', 2.7);
-  drawB('svg-B', -1.6);
-  drawB('svg-B3', 1.6);
+  // Build caption + dots
+  const stage=document.getElementById('stage');
+  if(stage){
+    const tc=document.createElement('div');tc.className='top-caption';tc.id='top-caption';tc.textContent='\u3000';stage.appendChild(tc);
+    const dw=document.createElement('div');dw.className='scene-dots';dw.id='scene-dots';
+    scenes.forEach(()=>{const d=document.createElement('div');d.className='dot';dw.appendChild(d);});
+    stage.appendChild(dw);
+  }
 
   requestAnimationFrame(frame);
 })();
