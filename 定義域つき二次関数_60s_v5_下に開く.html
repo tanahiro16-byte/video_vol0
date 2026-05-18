@@ -10,23 +10,23 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --primary:#f9c74f;
-  --primary-pale:rgba(249,199,79,0.1);
-  --accent:#90be6d;
-  --rose:#f15bb5;
-  --text-dark:#f0e8ff;
-  --bg-page:#0e0c1e;
-  --bg-stage:#130f28;
-  --white:#1a1535;
-  --card:#1e1840;
-  --line:rgba(249,199,79,0.15);
-  --text:#e8e0ff;
-  --text-sec:#8878b0;
-  --text-mut:#4a4070;
-  --red:#f15bb5;
-  --blue:#4cc9f0;
-  --green:#90be6d;
-  --cap-bg:#0a0818;
+  --primary:#c89a00;
+  --primary-pale:#fffbee;
+  --accent:#6c5ce7;
+  --rose:#d63384;
+  --text-dark:#1a1400;
+  --bg-page:#fffdf5;
+  --bg-stage:#ffffff;
+  --white:#ffffff;
+  --card:#fffbee;
+  --line:#ede0b0;
+  --text:#1a1400;
+  --text-sec:#6a5c30;
+  --text-mut:#b8a870;
+  --red:#c0392b;
+  --blue:#1848C0;
+  --green:#2d8a50;
+  --cap-bg:#1a1400;
   --cap-txt:#f9c74f;
 }
 html{height:100%;overflow-y:auto;}
@@ -35,14 +35,12 @@ body{
   background:var(--bg-page);min-height:100%;
   display:flex;align-items:center;justify-content:flex-start;flex-direction:column;
   gap:0;padding:0 16px 160px;color:var(--text);
-  background-image:radial-gradient(ellipse at 50% 0%,rgba(249,199,79,0.06) 0%,transparent 60%);
 }
 .stage-wrap{margin-top:16px;transform-origin:top center;}
 .stage{
   width:360px;height:640px;background:var(--bg-stage);border-radius:20px;
-  box-shadow:0 0 0 1px rgba(249,199,79,0.2),0 20px 60px rgba(249,199,79,0.08),0 0 100px rgba(249,199,79,0.03);
+  box-shadow:0 4px 6px rgba(0,0,0,0.06),0 20px 50px rgba(200,154,0,0.1),0 0 0 1px rgba(200,154,0,0.15);
   overflow:hidden;position:relative;
-  background-image:radial-gradient(ellipse at 50% 0%,rgba(249,199,79,0.07) 0%,transparent 50%);
 }
 .scene{position:absolute;inset:0;opacity:0;transition:opacity 0.4s ease;pointer-events:none;}
 .scene.active{opacity:1;}
@@ -58,10 +56,10 @@ body{
 .dot{width:5px;height:5px;border-radius:50%;background:rgba(249,199,79,0.12);transition:all 0.3s;}
 .dot.active-dot{background:var(--primary);width:14px;border-radius:3px;box-shadow:0 0 6px rgba(249,199,79,0.5);}
 .channel-bar{
-  width:360px;background:#100d22;border-radius:0 0 20px 20px;
-  border:1px solid rgba(249,199,79,0.15);border-top:none;
+  width:360px;background:#fff;border-radius:0 0 20px 20px;
+  border:1px solid rgba(200,154,0,0.15);border-top:none;
   padding:11px 16px 13px;display:flex;align-items:center;gap:10px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.3);position:relative;
+  box-shadow:0 8px 24px rgba(0,0,0,0.07);position:relative;
 }
 .channel-bar .ep-title{position:absolute;bottom:100%;left:16px;margin-bottom:5px;background:rgba(5,3,15,0.9);color:var(--primary);font-size:10px;padding:3px 8px;border-radius:6px;}
 .channel-bar .handle{font-size:13px;font-weight:700;color:var(--primary);text-shadow:0 0 8px rgba(249,199,79,0.3);}
@@ -71,22 +69,22 @@ body{
 .player-footer{
   position:fixed;bottom:0;left:0;right:0;
   display:flex;flex-direction:column;align-items:center;gap:6px;
-  background:rgba(14,12,30,0.96);backdrop-filter:blur(10px);
-  padding:10px 16px 14px;border-top:1px solid rgba(249,199,79,0.15);z-index:200;
+  background:rgba(255,253,245,0.96);backdrop-filter:blur(10px);
+  padding:10px 16px 14px;border-top:1px solid rgba(200,154,0,0.15);z-index:200;
 }
-.controls{display:flex;align-items:center;gap:12px;background:rgba(249,199,79,0.04);border:1px solid rgba(249,199,79,0.2);padding:10px 14px;border-radius:30px;box-shadow:0 0 20px rgba(249,199,79,0.06);width:360px;}
-.controls button{border:1px solid rgba(249,199,79,0.25);background:rgba(249,199,79,0.07);color:var(--primary);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.controls button:hover{background:rgba(249,199,79,0.16);}
-.progress{flex:1;height:6px;background:rgba(249,199,79,0.1);border-radius:3px;cursor:pointer;position:relative;touch-action:none;}
-.progress-fill{height:100%;background:linear-gradient(90deg,#f9c74f,#f4a261);border-radius:3px;width:0%;pointer-events:none;}
-.progress-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:var(--bg-page);border:2.5px solid var(--primary);pointer-events:none;left:0%;box-shadow:0 0 8px rgba(249,199,79,0.5);}
-.scene-mark{position:absolute;top:0;bottom:0;width:1.5px;background:rgba(249,199,79,0.25);pointer-events:none;border-radius:1px;}
-.time{font-size:11px;color:rgba(249,199,79,0.45);min-width:56px;text-align:right;font-variant-numeric:tabular-nums;}
+.controls{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid rgba(200,154,0,0.2);padding:10px 14px;border-radius:30px;box-shadow:0 2px 12px rgba(0,0,0,0.08);width:360px;}
+.controls button{border:1px solid rgba(200,154,0,0.25);background:#fffbee;color:var(--primary);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.controls button:hover{background:var(--primary-pale);}
+.progress{flex:1;height:6px;background:rgba(200,154,0,0.12);border-radius:3px;cursor:pointer;position:relative;touch-action:none;}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px;width:0%;pointer-events:none;}
+.progress-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:#fff;border:2.5px solid var(--primary);pointer-events:none;left:0%;box-shadow:0 2px 6px rgba(200,154,0,0.3);}
+.scene-mark{position:absolute;top:0;bottom:0;width:1.5px;background:rgba(200,154,0,0.25);pointer-events:none;border-radius:1px;}
+.time{font-size:11px;color:var(--text-sec);min-width:56px;text-align:right;font-variant-numeric:tabular-nums;}
 .scene-jumps{display:flex;gap:5px;width:360px;}
-.sjbtn{border:1px solid rgba(249,199,79,0.2);background:rgba(249,199,79,0.04);color:rgba(249,199,79,0.5);font-size:10px;padding:5px 0;border-radius:10px;cursor:pointer;flex:1;text-align:center;line-height:1.3;transition:all 0.2s;}
-.sjbtn:hover{background:rgba(249,199,79,0.12);color:var(--primary);}
-.sjbtn.sj-active{background:rgba(249,199,79,0.15);color:var(--primary);border-color:var(--primary);box-shadow:0 0 8px rgba(249,199,79,0.2);}
-.footnote{font-size:11px;color:rgba(249,199,79,0.3);text-align:center;max-width:360px;line-height:1.6;margin:0;}
+.sjbtn{border:1px solid rgba(200,154,0,0.2);background:#fff;color:var(--text-sec);font-size:10px;padding:5px 0;border-radius:10px;cursor:pointer;flex:1;text-align:center;line-height:1.3;transition:all 0.2s;}
+.sjbtn:hover{background:var(--primary-pale);color:var(--primary);}
+.sjbtn.sj-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.footnote{font-size:11px;color:var(--text-mut);text-align:center;max-width:360px;line-height:1.6;margin:0;}
 .content{position:absolute;top:54px;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:12px 16px 22px;overflow:hidden;}
 .nb-header{font-size:15px;font-weight:900;margin-bottom:10px;font-family:"Playfair Display",serif;}
 .nb-header.s2{color:var(--blue);}
@@ -344,7 +342,7 @@ body{
 (function(){
   const TOTAL=60;
   function gv(x){return -(x-3)*(x-3)+4;}
-  const C={primary:'#f9c74f',red:'#f15bb5',blue:'#4cc9f0',bg:'#1e1840'};
+  const C={primary:'#c89a00',red:'#c0392b',blue:'#1848C0',bg:'#fffbee'};
 
   function drawGraph(svgEl,cfg){
     const {xMin,xMaxV,yMaxV,yMinV,gx,gy,gw,gh,showMin,showMax,domL,domR}=cfg;
@@ -355,15 +353,15 @@ body{
     let h='<defs><filter id="glow"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
     for(let xi=Math.ceil(xMin);xi<=xMaxV;xi++){
       const xp=px(xi);
-      h+=`<line x1="${xp}" y1="${gy}" x2="${xp}" y2="${gy+gh+4}" stroke="rgba(249,199,79,0.08)" stroke-width="0.7"/>`;
-      h+=`<text x="${xp}" y="${gy+gh+14}" text-anchor="middle" fill="rgba(249,199,79,0.35)" font-size="9">${xi}</text>`;
+      h+=`<line x1="${xp}" y1="${gy}" x2="${xp}" y2="${gy+gh+4}" stroke="#ede0b0" stroke-width="0.7"/>`;
+      h+=`<text x="${xp}" y="${gy+gh+14}" text-anchor="middle" fill="#b8a870" font-size="9">${xi}</text>`;
     }
     for(let yi=Math.ceil(yMinV);yi<=yMaxV;yi+=2){
       const yp=py(yi);if(yp<gy-2||yp>gy+gh+5)continue;
-      h+=`<line x1="${gx}" y1="${yp}" x2="${gx+gw}" y2="${yp}" stroke="rgba(249,199,79,0.08)" stroke-width="0.7"/>`;
-      if(yi!==0)h+=`<text x="${gx-4}" y="${yp+3}" text-anchor="end" fill="rgba(249,199,79,0.35)" font-size="9">${yi}</text>`;
+      h+=`<line x1="${gx}" y1="${yp}" x2="${gx+gw}" y2="${yp}" stroke="#ede0b0" stroke-width="0.7"/>`;
+      if(yi!==0)h+=`<text x="${gx-4}" y="${yp+3}" text-anchor="end" fill="#b8a870" font-size="9">${yi}</text>`;
     }
-    h+=`<line x1="${gx}" y1="${yz}" x2="${gx+gw}" y2="${yz}" stroke="rgba(249,199,79,0.25)" stroke-width="1"/>`;
+    h+=`<line x1="${gx}" y1="${yz}" x2="${gx+gw}" y2="${yz}" stroke="#c8a840" stroke-width="1"/>`;
     const ixL=px(domL),ixR=px(domR);
     h+=`<line x1="${ixL}" y1="${yz}" x2="${ixR}" y2="${yz}" stroke="${C.primary}" stroke-width="5" opacity="0.18" stroke-linecap="round"/>`;
     h+=`<circle cx="${ixL}" cy="${yz}" r="3.5" fill="${C.primary}"/><circle cx="${ixR}" cy="${yz}" r="3.5" fill="${C.primary}"/>`;
