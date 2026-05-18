@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>定義域つき二次関数 ― a＜0（下に開く）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#f9c74f;
+  --primary-pale:rgba(249,199,79,0.1);
+  --accent:#90be6d;
+  --rose:#f15bb5;
+  --text-dark:#f0e8ff;
+  --bg-page:#0e0c1e;
+  --bg-stage:#130f28;
+  --white:#1a1535;
+  --card:#1e1840;
+  --line:rgba(249,199,79,0.15);
+  --text:#e8e0ff;
+  --text-sec:#8878b0;
+  --text-mut:#4a4070;
+  --red:#f15bb5;
+  --blue:#4cc9f0;
+  --green:#90be6d;
+  --cap-bg:#0a0818;
+  --cap-txt:#f9c74f;
+}
+html{height:100%;overflow-y:auto;}
+body{
+  font-family:"Noto Sans JP",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  background:var(--bg-page);min-height:100%;
+  display:flex;align-items:center;justify-content:flex-start;flex-direction:column;
+  gap:0;padding:0 16px 160px;color:var(--text);
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(249,199,79,0.06) 0%,transparent 60%);
+}
+.stage-wrap{margin-top:16px;transform-origin:top center;}
+.stage{
+  width:360px;height:640px;background:var(--bg-stage);border-radius:20px;
+  box-shadow:0 0 0 1px rgba(249,199,79,0.2),0 20px 60px rgba(249,199,79,0.08),0 0 100px rgba(249,199,79,0.03);
+  overflow:hidden;position:relative;
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(249,199,79,0.07) 0%,transparent 50%);
+}
+.scene{position:absolute;inset:0;opacity:0;transition:opacity 0.4s ease;pointer-events:none;}
+.scene.active{opacity:1;}
+.top-caption{
+  position:absolute;top:0;left:0;right:0;background:var(--cap-bg);color:var(--cap-txt);
+  padding:10px 16px;text-align:center;font-weight:900;font-size:14px;line-height:1.35;
+  min-height:54px;z-index:80;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid rgba(249,199,79,0.2);
+  text-shadow:0 0 16px rgba(249,199,79,0.5);
+}
+.top-caption.sm{font-size:11px;}
+.scene-dots{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:90;}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(249,199,79,0.12);transition:all 0.3s;}
+.dot.active-dot{background:var(--primary);width:14px;border-radius:3px;box-shadow:0 0 6px rgba(249,199,79,0.5);}
+.channel-bar{
+  width:360px;background:#100d22;border-radius:0 0 20px 20px;
+  border:1px solid rgba(249,199,79,0.15);border-top:none;
+  padding:11px 16px 13px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);position:relative;
+}
+.channel-bar .ep-title{position:absolute;bottom:100%;left:16px;margin-bottom:5px;background:rgba(5,3,15,0.9);color:var(--primary);font-size:10px;padding:3px 8px;border-radius:6px;}
+.channel-bar .handle{font-size:13px;font-weight:700;color:var(--primary);text-shadow:0 0 8px rgba(249,199,79,0.3);}
+.channel-bar .sub-btn{margin-left:auto;background:linear-gradient(135deg,var(--primary),#f4a261);color:#1a1535;font-size:11px;font-weight:900;padding:7px 16px;border-radius:20px;flex-shrink:0;box-shadow:0 0 14px rgba(249,199,79,0.3);}
+.fi{opacity:0;transition:opacity 0.4s ease,transform 0.4s cubic-bezier(0.34,1.56,0.64,1);transform:translateY(8px);}
+.scene.active .fi.show{opacity:1;transform:translateY(0);}
+.player-footer{
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:rgba(14,12,30,0.96);backdrop-filter:blur(10px);
+  padding:10px 16px 14px;border-top:1px solid rgba(249,199,79,0.15);z-index:200;
+}
+.controls{display:flex;align-items:center;gap:12px;background:rgba(249,199,79,0.04);border:1px solid rgba(249,199,79,0.2);padding:10px 14px;border-radius:30px;box-shadow:0 0 20px rgba(249,199,79,0.06);width:360px;}
+.controls button{border:1px solid rgba(249,199,79,0.25);background:rgba(249,199,79,0.07);color:var(--primary);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.controls button:hover{background:rgba(249,199,79,0.16);}
+.progress{flex:1;height:6px;background:rgba(249,199,79,0.1);border-radius:3px;cursor:pointer;position:relative;touch-action:none;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#f9c74f,#f4a261);border-radius:3px;width:0%;pointer-events:none;}
+.progress-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:var(--bg-page);border:2.5px solid var(--primary);pointer-events:none;left:0%;box-shadow:0 0 8px rgba(249,199,79,0.5);}
+.scene-mark{position:absolute;top:0;bottom:0;width:1.5px;background:rgba(249,199,79,0.25);pointer-events:none;border-radius:1px;}
+.time{font-size:11px;color:rgba(249,199,79,0.45);min-width:56px;text-align:right;font-variant-numeric:tabular-nums;}
+.scene-jumps{display:flex;gap:5px;width:360px;}
+.sjbtn{border:1px solid rgba(249,199,79,0.2);background:rgba(249,199,79,0.04);color:rgba(249,199,79,0.5);font-size:10px;padding:5px 0;border-radius:10px;cursor:pointer;flex:1;text-align:center;line-height:1.3;transition:all 0.2s;}
+.sjbtn:hover{background:rgba(249,199,79,0.12);color:var(--primary);}
+.sjbtn.sj-active{background:rgba(249,199,79,0.15);color:var(--primary);border-color:var(--primary);box-shadow:0 0 8px rgba(249,199,79,0.2);}
+.footnote{font-size:11px;color:rgba(249,199,79,0.3);text-align:center;max-width:360px;line-height:1.6;margin:0;}
+.content{position:absolute;top:54px;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:12px 16px 22px;overflow:hidden;}
+.nb-header{font-size:15px;font-weight:900;margin-bottom:10px;font-family:"Playfair Display",serif;}
+.nb-header.s2{color:var(--blue);}
+.nb-header.s3{color:var(--red);}
+.nb-header.s5{color:var(--primary);}
+.nb-header .bracket{color:var(--text-mut);font-weight:400;}
+.step-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--primary),#f4a261);color:#1a1535;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:900;margin-bottom:10px;letter-spacing:0.04em;box-shadow:0 0 12px rgba(249,199,79,0.3);}
+.chain{display:flex;flex-direction:column;gap:0;}
+.chain-step{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.75;}
+.chain-step b{font-weight:900;color:var(--primary);}
+.chain-step.known{border-left:3px solid var(--text-mut);}
+.chain-step.insight{border-left:3px solid var(--primary);background:rgba(249,199,79,0.06);}
+.chain-arrow-row{display:flex;align-items:center;gap:5px;padding:3px 6px;}
+.chain-arrow-row .arr{color:var(--primary);font-size:14px;}
+.chain-arrow-row .why{font-size:10px;color:var(--text-sec);}
+.chain-concl{margin-top:8px;background:rgba(249,199,79,0.08);border:1px solid rgba(249,199,79,0.25);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;color:var(--primary);line-height:1.7;}
+.demo-wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:6px 0;}
+.demo-wrap svg{width:100%;display:block;}
+.info-items{display:flex;flex-direction:column;gap:7px;}
+.info-item{background:var(--card);border-radius:10px;padding:9px 12px;border:1px solid var(--line);}
+.info-body{font-size:12px;line-height:1.75;}
+.info-body b{font-weight:900;color:var(--primary);}
+.info-body .math{font-style:italic;font-size:13px;font-weight:700;color:var(--primary);}
+.info-body .sub{display:block;font-size:10.5px;color:var(--text-sec);margin-top:2px;}
+.info-key{margin-top:8px;background:rgba(249,199,79,0.07);border:1px solid rgba(249,199,79,0.2);border-radius:10px;padding:9px 12px;font-size:12px;font-weight:700;color:var(--primary);line-height:1.8;}
+.hook-eyebrow{font-size:11px;font-weight:700;color:var(--rose);letter-spacing:0.08em;margin-bottom:6px;}
+.hook-q{font-size:18px;font-weight:900;line-height:1.5;color:var(--text-dark);font-family:"Playfair Display",serif;}
+.hook-problem{margin-top:12px;background:var(--card);border:1px solid rgba(249,199,79,0.2);border-radius:14px;padding:14px 16px;box-shadow:0 0 30px rgba(249,199,79,0.05);}
+.hook-problem .hfunc{font-size:19px;font-weight:700;font-style:italic;color:var(--primary);text-align:center;margin:8px 0;text-shadow:0 0 16px rgba(249,199,79,0.3);}
+.hook-problem .hdomain{font-size:12px;color:var(--text-sec);}
+.hook-problem .hask{font-size:11px;color:var(--text-mut);margin-top:6px;border-top:1px solid var(--line);padding-top:6px;}
+.hook-note{margin-top:11px;font-size:12.5px;color:var(--text-sec);line-height:1.85;}
+.hook-note b{color:var(--primary);font-weight:700;}
+.hook-twist{margin-top:10px;background:rgba(241,91,181,0.1);border:1px solid rgba(241,91,181,0.25);border-radius:10px;padding:9px 12px;font-size:12.5px;font-weight:700;color:var(--rose);line-height:1.75;}
+.ans-box{background:var(--card);border-radius:12px;border:1px solid var(--line);padding:12px 16px;margin-top:8px;}
+.ans-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed rgba(249,199,79,0.1);font-size:13px;}
+.ans-row:last-child{border-bottom:none;}
+.ans-label{font-size:11px;font-weight:700;color:var(--text-sec);min-width:50px;}
+.ans-val{font-style:italic;font-size:18px;font-weight:700;}
+.ans-val.blue{color:var(--blue);}
+.ans-val.red{color:var(--red);}
+.ans-val.gold{color:var(--primary);text-shadow:0 0 8px rgba(249,199,79,0.4);}
+.ans-where{font-size:10.5px;color:var(--text-mut);}
+.toko-box{background:rgba(249,199,79,0.05);border:1px solid rgba(249,199,79,0.18);border-radius:12px;padding:13px 15px;margin-top:8px;}
+.toko-line{font-size:12.5px;font-style:italic;line-height:2.1;color:var(--text-dark);}
+.toko-line .jp{font-style:normal;font-size:11px;color:var(--text-sec);}
+.toko-line .hl{color:var(--primary);font-weight:700;}
+.toko-underline{border-bottom:1px solid rgba(249,199,79,0.18);padding-bottom:4px;margin-bottom:4px;}
+.sum-insight{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;line-height:2.1;margin-top:8px;}
+.sum-insight .max{color:var(--primary);}
+.sum-insight .min{color:var(--red);}
+.sum-insight .note{font-size:10px;font-weight:400;color:var(--text-sec);}
+.key-rule{background:rgba(249,199,79,0.07);border:1px solid rgba(249,199,79,0.2);border-radius:10px;padding:9px 13px;font-size:12px;font-weight:700;color:var(--primary);line-height:1.9;margin-top:8px;}
+.next-card{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:11px;color:var(--text-sec);line-height:1.85;}
+</style>
+</head>
+<body>
+<div class="stage-wrap">
+<div class="stage" id="stage">
+
+<!-- Scene 01: Hook -->
+<div class="scene" id="scene-01">
+  <div class="content">
+    <div class="hook-eyebrow fi" data-show="0.1">vol.4 定義域つき二次関数</div>
+    <div class="hook-q fi" data-show="0.4">a が負になったら<br>全部ひっくり返る</div>
+    <div class="hook-problem fi" data-show="1.4">
+      <div class="hdomain">1 ≦ x ≦ 6 のとき</div>
+      <div class="hfunc">h(x) = −x² + 6x − 5</div>
+      <div class="hask">の最小値・最大値を求めよ</div>
+    </div>
+    <div class="hook-twist fi" data-show="3.0">
+      a = −1 ＜ 0 → 下に開く<br>
+      頂点が「最大」になる。最小はどこ？
+    </div>
+  </div>
+</div>
+
+<!-- Scene 02: ①情報の整理 -->
+<div class="scene" id="scene-02">
+  <div class="content">
+    <span class="step-badge fi" data-show="0.0">① 情報の整理</span>
+    <div class="info-items">
+      <div class="info-item fi" data-show="0.4">
+        <div class="info-body"><b>求めたいもの</b>：最小値・最大値</div>
+      </div>
+      <div class="info-item fi" data-show="1.3">
+        <div class="info-body">
+          <b>与えられてるもの</b>
+          <span class="sub">h(x) = −x²+6x−5 = −(x−3)²+4<br>区間 : 1 ≦ x ≦ 6 （端点 x=1, x=6）</span>
+        </div>
+      </div>
+      <div class="info-item fi" data-show="2.5">
+        <div class="info-body">
+          <b>下に開く（a=−1）</b>。軸 <span class="math">x = 3</span>、頂点 <span class="math">(3, 4)</span><br>
+          x=3 は [1, 6] の<b>区間内</b>にある
+        </div>
+      </div>
+    </div>
+    <div class="info-key fi" data-show="3.8">
+      a＜0 → 頂点が<b>最大</b><br>
+      最小は「軸から遠い端点」で達成
+    </div>
+  </div>
+</div>
+
+<!-- Scene 03: ②連想 最大（頂点） -->
+<div class="scene" id="scene-03">
+  <div class="content">
+    <span class="step-badge fi" data-show="0.0">② 連想すること</span>
+    <div class="nb-header s2 fi" data-show="0.1">― 最大について（a＜0）</div>
+    <div class="chain">
+      <div class="chain-step known fi" data-show="0.4">
+        下に開く → <b>軸に近いほど大きい</b><br>
+        頂点 x=3 が区間内にある
+      </div>
+      <div class="chain-arrow-row fi" data-show="1.1"><span class="arr">↓</span><span class="why">頂点を区間内で達成できる</span></div>
+      <div class="chain-step insight fi" data-show="1.3">
+        頂点 x = 3 で最大<br>
+        h(3) = −(3−3)²+4 = <b>4</b>
+      </div>
+    </div>
+    <div class="demo-wrap fi" data-show="2.1">
+      <svg id="svg-max-demo" viewBox="0 0 320 130"></svg>
+    </div>
+    <div class="chain-concl fi" data-show="2.3">
+      <b>最大値 4</b>　← 頂点 x=3 で達成
+    </div>
+  </div>
+</div>
+
+<!-- Scene 04: ②連想 最小（遠い端点） -->
+<div class="scene" id="scene-04">
+  <div class="content">
+    <span class="step-badge fi" data-show="0.0">② 連想すること</span>
+    <div class="nb-header s3 fi" data-show="0.1">― 最小について（a＜0）</div>
+    <div class="chain">
+      <div class="chain-step known fi" data-show="0.4">
+        下に開く → <b>軸から遠いほど小さい</b><br>
+        端点 x=1 と x=6 のどちらが遠い？
+      </div>
+      <div class="chain-arrow-row fi" data-show="1.1"><span class="arr">↓</span><span class="why">軸 x=3 との距離を比較</span></div>
+      <div class="chain-step insight fi" data-show="1.3">
+        |1−3| = 2　|6−3| = <b>3</b><br>
+        → 右端 x=6 の方が遠い → <b>最小は x=6</b><br>
+        h(6) = −36+36−5 = <b>−5</b>
+      </div>
+    </div>
+    <div class="demo-wrap fi" data-show="2.1">
+      <svg id="svg-min-demo" viewBox="0 0 320 130"></svg>
+    </div>
+    <div class="chain-concl fi" data-show="2.3">
+      <b>最小値 −5</b>　← 右端 x=6 で達成
+    </div>
+  </div>
+</div>
+
+<!-- Scene 05: ③方針の立案 -->
+<div class="scene" id="scene-05">
+  <div class="content">
+    <span class="step-badge fi" data-show="0.0">③ 方針の立案</span>
+    <div class="demo-wrap fi" data-show="0.3">
+      <svg id="svg-plan" viewBox="0 0 320 160"></svg>
+    </div>
+    <div class="ans-box fi" data-show="1.0">
+      <div class="ans-row">
+        <span class="ans-label">最大値</span>
+        <span class="ans-val gold">4</span>
+        <span class="ans-where">　x=3（頂点）で達成</span>
+      </div>
+      <div class="ans-row">
+        <span class="ans-label">最小値</span>
+        <span class="ans-val red">−5</span>
+        <span class="ans-where">　x=6（遠い端点）で達成</span>
+      </div>
+    </div>
+    <div class="chain-concl fi" data-show="3.0">
+      a＜0 でも②の連想の流れは同じ<br>
+      → 最大と最小が入れ替わるだけ
+    </div>
+  </div>
+</div>
+
+<!-- Scene 06: ④答案作成 -->
+<div class="scene" id="scene-06">
+  <div class="content">
+    <span class="step-badge fi" data-show="0.0">④ 答案作成</span>
+    <div class="toko-box fi" data-show="0.3">
+      <div class="toko-line toko-underline">h(x) = −(x−3)² + 4</div>
+      <div class="toko-line fi" data-show="0.8">
+        1 ≦ x ≦ 6 において 軸 x=3 は区間内<br>
+        <span class="jp">かつ a＜0（下に開く）</span>
+      </div>
+      <div class="toko-line fi" data-show="2.0">
+        よって<br>
+        x = <span class="hl">3</span> のとき　<b>最大値 <span class="hl">4</span></b>
+      </div>
+      <div class="toko-line fi" data-show="3.2">
+        x = <span class="hl">6</span> のとき　<b>最小値 <span class="hl">−5</span></b><br>
+        <span class="jp">（h(1)=0 ＞ h(6)=−5 より 遠い右端）</span>
+      </div>
+    </div>
+    <div class="info-key fi" data-show="4.5" style="margin-top:8px;">
+      a＜0 → 最大と最小が入れ替わるだけ<br>
+      考え方の枠組みは変わらない
+    </div>
+  </div>
+</div>
+
+<!-- Scene 07: まとめ -->
+<div class="scene" id="scene-07">
+  <div class="content">
+    <div class="nb-header s5 fi" data-show="0.0"><span class="bracket">[</span>まとめ<span class="bracket">]</span>　a ＜ 0 のとき</div>
+    <div class="sum-insight fi" data-show="0.3">
+      下に開く → <span class="max">頂点が最大</span><br>
+      <span class="max">最大</span>：頂点 x=3　値 = 4<br>
+      <span class="min">最小</span>：軸から遠い端点 x=6　値 = −5<br>
+      <span class="note">→ a＞0 のときと最大・最小が逆</span>
+    </div>
+    <div class="key-rule fi" data-show="1.8">
+      a の符号で「頂点 = 最大 or 最小」が変わる<br>
+      それ以外の連想ステップは同じ<br>
+      ①符号確認 → ②連想 → ③方針 → ④答案
+    </div>
+    <div class="next-card fi" data-show="3.5">
+      シリーズ完結。全4パターン：<br>
+      頂点内側 / 頂点左外 / 頂点右外 / a＜0<br>
+      → 軸の位置と符号を確認するだけ。
+    </div>
+  </div>
+</div>
+
+</div><!-- /stage -->
+<div class="channel-bar" id="channel-bar">
+  <span class="ep-title">定義域つき二次関数 vol.4</span>
+  <span class="handle">@Mathrive</span>
+  <span class="sub-btn">フォローする</span>
+</div>
+</div><!-- /stage-wrap -->
+
+<audio id="bgm" src="BGM.mp3" loop></audio>
+
+<div class="player-footer">
+  <div class="controls" style="width:360px;margin:0;">
+    <button id="play-pause">⏸</button>
+    <button id="sound" style="font-size:11px;width:auto;padding:0 12px;border-radius:18px;height:36px;">音 OFF</button>
+    <button id="bgm-btn" style="font-size:11px;width:auto;padding:0 12px;border-radius:18px;height:36px;">BGM OFF</button>
+    <div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div><div class="progress-thumb" id="progress-thumb"></div></div>
+    <span class="time" id="time">0:00 / 1:00</span>
+  </div>
+  <div class="scene-jumps" id="scene-jumps"></div>
+  <p class="footnote">スペースキー：一時停止 / シーンボタン：その場面へジャンプ</p>
+</div>
+
+<script>
+(function(){
+  const TOTAL=60;
+  function gv(x){return -(x-3)*(x-3)+4;}
+  const C={primary:'#f9c74f',red:'#f15bb5',blue:'#4cc9f0',bg:'#1e1840'};
+
+  function drawGraph(svgEl,cfg){
+    const {xMin,xMaxV,yMaxV,yMinV,gx,gy,gw,gh,showMin,showMax,domL,domR}=cfg;
+    const yRange=yMaxV-yMinV;
+    const px=x=>gx+(x-xMin)/(xMaxV-xMin)*gw;
+    const py=y=>gy+gh-(y-yMinV)/yRange*gh;
+    const yz=py(0);
+    let h='<defs><filter id="glow"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+    for(let xi=Math.ceil(xMin);xi<=xMaxV;xi++){
+      const xp=px(xi);
+      h+=`<line x1="${xp}" y1="${gy}" x2="${xp}" y2="${gy+gh+4}" stroke="rgba(249,199,79,0.08)" stroke-width="0.7"/>`;
+      h+=`<text x="${xp}" y="${gy+gh+14}" text-anchor="middle" fill="rgba(249,199,79,0.35)" font-size="9">${xi}</text>`;
+    }
+    for(let yi=Math.ceil(yMinV);yi<=yMaxV;yi+=2){
+      const yp=py(yi);if(yp<gy-2||yp>gy+gh+5)continue;
+      h+=`<line x1="${gx}" y1="${yp}" x2="${gx+gw}" y2="${yp}" stroke="rgba(249,199,79,0.08)" stroke-width="0.7"/>`;
+      if(yi!==0)h+=`<text x="${gx-4}" y="${yp+3}" text-anchor="end" fill="rgba(249,199,79,0.35)" font-size="9">${yi}</text>`;
+    }
+    h+=`<line x1="${gx}" y1="${yz}" x2="${gx+gw}" y2="${yz}" stroke="rgba(249,199,79,0.25)" stroke-width="1"/>`;
+    const ixL=px(domL),ixR=px(domR);
+    h+=`<line x1="${ixL}" y1="${yz}" x2="${ixR}" y2="${yz}" stroke="${C.primary}" stroke-width="5" opacity="0.18" stroke-linecap="round"/>`;
+    h+=`<circle cx="${ixL}" cy="${yz}" r="3.5" fill="${C.primary}"/><circle cx="${ixR}" cy="${yz}" r="3.5" fill="${C.primary}"/>`;
+    h+=`<text x="${ixL}" y="${yz+13}" text-anchor="middle" fill="${C.primary}" font-size="9" font-weight="700">${domL}</text>`;
+    h+=`<text x="${ixR}" y="${yz+13}" text-anchor="middle" fill="${C.primary}" font-size="9" font-weight="700">${domR}</text>`;
+    let pIn='',pOut='';
+    for(let x=xMin;x<=xMaxV;x+=0.02){
+      const y=gv(x);if(y<yMinV-0.5||y>yMaxV+1)continue;
+      const coord=`${px(x).toFixed(1)},${py(y).toFixed(1)}`;
+      if(x>=domL&&x<=domR){pIn+=(pIn?'L':'M')+coord;}else{pOut+=(pOut?'L':'M')+coord;}
+    }
+    if(pOut)h+=`<path d="${pOut}" stroke="rgba(249,199,79,0.18)" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>`;
+    if(pIn)h+=`<path d="${pIn}" stroke="${C.primary}" stroke-width="2.5" fill="none" filter="url(#glow)"/>`;
+    h+=`<line x1="${px(3)}" y1="${gy}" x2="${px(3)}" y2="${yz+4}" stroke="${C.red}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    h+=`<text x="${px(3)}" y="${gy-2}" text-anchor="middle" fill="${C.red}" font-size="9" font-weight="700">x=3</text>`;
+    if(showMax){const mx=px(3),my=py(gv(3));h+=`<circle cx="${mx}" cy="${my}" r="7" fill="${C.primary}" stroke="${C.bg}" stroke-width="2"/><text x="${mx}" y="${my-12}" text-anchor="middle" fill="${C.primary}" font-size="10" font-weight="700">最大</text>`;}
+    if(showMin){const mx=px(domR),my=py(gv(domR));h+=`<circle cx="${mx}" cy="${my}" r="7" fill="${C.red}" stroke="${C.bg}" stroke-width="2"/><text x="${mx}" y="${my-12}" text-anchor="middle" fill="${C.red}" font-size="10" font-weight="700">最小</text>`;}
+    svgEl.innerHTML=h;
+  }
+
+  const BASE={xMin:-0.5,xMaxV:7.5,yMaxV:5,yMinV:-6,gx:28,gy:10,gw:260,gh:100,domL:1,domR:6};
+  const narrations={
+    'scene-01':'定義域つき二次関数、第4回。aが負になると全部ひっくり返る。h(x)はマイナスx二乗プラス6xマイナス5。区間は1から6。',
+    'scene-02':'情報の整理。h(x)はマイナスx-3の二乗プラス4。下に開く。軸x=3は区間1から6の内側にある。下に開くから頂点が最大になる。',
+    'scene-03':'最大を連想して。下に開くから軸に近いほど大きい。頂点が区間内にあるから頂点で最大を達成できる。h(3)=4。最大値は4。',
+    'scene-04':'最小を連想して。下に開くから軸から遠いほど小さい。端点x=1とx=6、軸x=3からの距離は2と3。右端x=6の方が遠い。h(6)=-5。',
+    'scene-05':'方針。頂点で最大値4、遠い右端x=6で最小値-5。a<0だと最大と最小が入れ替わるだけで考え方は同じ。',
+    'scene-06':'答案。h(x)=-x-3の二乗プラス4。区間内に軸があり下に開く。x=3で最大値4、x=6で最小値-5。',
+    'scene-07':'シリーズ完結。4パターン。頂点内側、左外、右外、そしてaがマイナスのケース。共通は①で軸と符号を確認すること。あとは連想の流れで決まる。',
+  };
+  const scenes=[
+    {id:'scene-01',s:0,e:8},{id:'scene-02',s:8,e:18},{id:'scene-03',s:18,e:28},
+    {id:'scene-04',s:28,e:38},{id:'scene-05',s:38,e:46},{id:'scene-06',s:46,e:54},{id:'scene-07',s:54,e:60},
+  ];
+  let t=0,playing=true,last=performance.now(),voiceEnabled=false,lastSpoken=null,jaVoice=null,bgmEnabled=false;
+  const bgmEl=document.getElementById('bgm');if(bgmEl)bgmEl.volume=0.18;
+  function pickJaVoice(){return('speechSynthesis'in window)?speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('ja'))||null:null;}
+  function speakScene(id){if(!voiceEnabled||id===lastSpoken)return;lastSpoken=id;if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(narrations[id]||'');u.lang='ja-JP';u.rate=1.05;if(jaVoice)u.voice=jaVoice;speechSynthesis.speak(u);}
+  if('speechSynthesis'in window){speechSynthesis.onvoiceschanged=()=>{jaVoice=pickJaVoice();};jaVoice=pickJaVoice();}
+  function updateDots(id){const el=document.getElementById('scene-dots');if(!el)return;el.querySelectorAll('.dot').forEach((d,i)=>{d.classList.toggle('active-dot',scenes[i].id===id);});}
+  const capTexts={'scene-01':'定義域つき二次関数 ― a ＜ 0（下に開く）','scene-02':'① 情報の整理','scene-03':'② 連想すること　― 最大','scene-04':'② 連想すること　― 最小','scene-05':'③ 方針の立案','scene-06':'④ 答案作成','scene-07':'まとめ（シリーズ完結）'};
+  let updateSceneJumps=null;
+  function setActive(sId,lt){
+    scenes.forEach(s=>{const el=document.getElementById(s.id);if(!el)return;const a=s.id===sId;if(a&&!el.classList.contains('active')){el.classList.add('active');el.querySelectorAll('.fi').forEach(f=>f.classList.remove('show'));}else if(!a)el.classList.remove('active');});
+    const active=document.getElementById(sId);
+    if(active)active.querySelectorAll('.fi').forEach(f=>{f.classList.toggle('show',lt>=(parseFloat(f.dataset.show)||0));});
+    const tc=document.getElementById('top-caption');if(tc){const txt=capTexts[sId]||'\u3000';tc.textContent=txt;tc.className='top-caption'+(txt.length>=20?' sm':'');}
+    updateDots(sId);if(typeof updateSceneJumps==='function')updateSceneJumps(sId);
+  }
+  function fmt(x){const m=Math.floor(x/60),s=Math.floor(x%60);return m+':'+(s<10?'0'+s:s);}
+  let drawnScenes={};
+  function drawSceneGraphs(sId){
+    if(drawnScenes[sId])return;drawnScenes[sId]=true;
+    if(sId==='scene-03'){const el=document.getElementById('svg-max-demo');if(el)drawGraph(el,{...BASE,showMin:false,showMax:true});}
+    if(sId==='scene-04'){const el=document.getElementById('svg-min-demo');if(el)drawGraph(el,{...BASE,showMin:true,showMax:false});}
+    if(sId==='scene-05'){const el=document.getElementById('svg-plan');if(el)drawGraph(el,{...BASE,gh:130,showMin:true,showMax:true});}
+  }
+  function frame(now){
+    const dt=(now-last)/1000;last=now;if(playing)t+=dt;
+    if(t>=TOTAL){t=0;lastSpoken=null;drawnScenes={};if('speechSynthesis'in window)speechSynthesis.cancel();}
+    const cur=scenes.find(s=>t>=s.s&&t<s.e)||scenes[scenes.length-1];
+    drawSceneGraphs(cur.id);setActive(cur.id,t-cur.s);speakScene(cur.id);
+    const pct=(t/TOTAL*100)+'%';
+    document.getElementById('progress-fill').style.width=pct;
+    const th=document.getElementById('progress-thumb');if(th)th.style.left=pct;
+    document.getElementById('time').textContent=fmt(t)+' / 1:00';
+    requestAnimationFrame(frame);
+  }
+  document.getElementById('play-pause').addEventListener('click',()=>{playing=!playing;document.getElementById('play-pause').textContent=playing?'⏸':'⏵';if(!playing){if('speechSynthesis'in window)speechSynthesis.pause();if(bgmEnabled&&bgmEl)bgmEl.pause();}else{if('speechSynthesis'in window)speechSynthesis.resume();if(bgmEnabled&&bgmEl)bgmEl.play();}});
+  document.getElementById('bgm-btn').addEventListener('click',()=>{bgmEnabled=!bgmEnabled;document.getElementById('bgm-btn').textContent=bgmEnabled?'BGM ON':'BGM OFF';if(bgmEl){if(bgmEnabled&&playing){bgmEl.currentTime=t%bgmEl.duration||0;bgmEl.play().catch(()=>{});}else bgmEl.pause();}});
+  document.getElementById('sound').addEventListener('click',()=>{voiceEnabled=!voiceEnabled;document.getElementById('sound').textContent=voiceEnabled?'音 ON':'音 OFF';if(!voiceEnabled&&'speechSynthesis'in window)speechSynthesis.cancel();lastSpoken=null;if(!jaVoice)jaVoice=pickJaVoice();});
+  const progressEl=document.getElementById('progress');const thumbEl=document.getElementById('progress-thumb');let dragging=false;
+  function seekTo(cx){const r=progressEl.getBoundingClientRect();t=Math.max(0,Math.min(1,(cx-r.left)/r.width))*TOTAL;lastSpoken=null;drawnScenes={};if('speechSynthesis'in window)speechSynthesis.cancel();}
+  progressEl.addEventListener('mousedown',(e)=>{dragging=true;seekTo(e.clientX);});
+  progressEl.addEventListener('touchstart',(e)=>{dragging=true;seekTo(e.touches[0].clientX);},{passive:true});
+  window.addEventListener('mousemove',(e)=>{if(dragging)seekTo(e.clientX);});
+  window.addEventListener('touchmove',(e)=>{if(dragging)seekTo(e.touches[0].clientX);},{passive:true});
+  window.addEventListener('mouseup',()=>{dragging=false;});window.addEventListener('touchend',()=>{dragging=false;});
+  scenes.slice(1).forEach(s=>{const mk=document.createElement('div');mk.className='scene-mark';mk.style.left=(s.s/TOTAL*100)+'%';progressEl.appendChild(mk);});
+  const sjLabels=['Hook','①整理','②最大','②最小','③方針','④答案','まとめ'];
+  const sjC=document.getElementById('scene-jumps');const sjBtns=[];
+  scenes.forEach((s,i)=>{const b=document.createElement('button');b.className='sjbtn';b.textContent=sjLabels[i];b.addEventListener('click',()=>{t=s.s;lastSpoken=null;drawnScenes={};if('speechSynthesis'in window)speechSynthesis.cancel();});sjC.appendChild(b);sjBtns.push(b);});
+  updateSceneJumps=(id)=>{sjBtns.forEach((b,i)=>{b.classList.toggle('sj-active',scenes[i].id===id);});};
+  document.addEventListener('keydown',(e)=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();document.getElementById('play-pause').click();}});
+  const stage=document.getElementById('stage');
+  if(stage){const tc=document.createElement('div');tc.className='top-caption';tc.id='top-caption';tc.textContent='\u3000';stage.appendChild(tc);const dw=document.createElement('div');dw.className='scene-dots';dw.id='scene-dots';scenes.forEach(()=>{const d=document.createElement('div');d.className='dot';dw.appendChild(d);});stage.appendChild(dw);}
+  requestAnimationFrame(frame);
+  function fitStage(){const wrap=document.querySelector('.stage-wrap');if(!wrap)return;const fh=document.querySelector('.player-footer')?.offsetHeight||155;const av=window.innerHeight-fh-32;const sh=wrap.scrollHeight||710;const sc=Math.min(1,av/sh);wrap.style.transform=`scale(${sc})`;wrap.style.marginBottom=`${-(1-sc)*sh}px`;wrap.style.marginLeft=`${-(1-sc)*360/2}px`;wrap.style.marginRight=`${-(1-sc)*360/2}px`;}
+  window.addEventListener('resize',fitStage);setTimeout(fitStage,100);
+})();
+</script>
+</body>
+</html>
