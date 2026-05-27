@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>定義域つき二次関数 v18</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --purple: #b01eff;
+  --pink:   #EC4899;
+  --navy:   #1E1B4B;
+  --bg:     #FFFFFF;
+  --bg-sub: #F9F7FF;
+  --border: #E8E2F8;
+  --muted:  #7B72A8;
+  --green:  #059669;
+  --red:    #DC2626;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: #D0D0D0;
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow: hidden;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+#app {
+  width: 100%; max-width: 430px; height: 100vh;
+  background: var(--bg);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+#progress-wrap { height: 4px; background: var(--border); flex-shrink: 0; cursor: pointer; }
+#progress-fill { height: 100%; background: var(--purple); width: 0%; transition: width 0.15s linear; }
+
+#header {
+  flex-shrink: 0; padding: 10px 20px 9px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-size: 18px; font-weight: 900; color: var(--purple); }
+.slide-num { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+#content { flex: 1; position: relative; overflow: hidden; }
+
+.scene {
+  position: absolute; inset: 0;
+  padding: 14px 22px 12px;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  opacity: 0; transform: translateX(20px);
+  transition: opacity 0.38s ease, transform 0.38s ease;
+  pointer-events: none; overflow-y: auto;
+}
+.scene.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.scene.exit   { opacity: 0; transform: translateX(-20px); }
+.scene.cover  { background: var(--bg-sub); justify-content: flex-start; padding-top: 20px; }
+
+#footer {
+  flex-shrink: 0; padding: 7px 20px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--border); background: var(--bg); gap: 12px;
+}
+.dot-row { display: flex; gap: 5px; align-items: center; flex: 1; }
+.dot { width: 6px; height: 6px; border-radius: 3px; background: var(--border); transition: all 0.3s; cursor: pointer; }
+.dot.on { background: var(--purple); width: 16px; }
+.account { font-size: 12px; font-weight: 700; color: var(--purple); white-space: nowrap; }
+
+#ctrl-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--purple); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: transform 0.15s;
+}
+#ctrl-btn:active { transform: scale(0.92); }
+#ctrl-btn svg { width: 16px; height: 16px; fill: white; }
+
+#pause-overlay {
+  position: absolute; inset: 0;
+  background: rgba(30,27,75,0.18);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 50;
+}
+#pause-overlay.show { opacity: 1; }
+.pause-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(176,30,255,0.85);
+  display: flex; align-items: center; justify-content: center;
+}
+.pause-icon svg { width: 28px; height: 28px; fill: white; }
+
+/* TYPOGRAPHY */
+.label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--purple); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.label::before { content: ''; width: 14px; height: 2px; background: var(--purple); display: block; flex-shrink: 0; }
+.label.pk { color: var(--pink); }
+.label.pk::before { background: var(--pink); }
+
+h1 { font-size: clamp(24px,5.8vw,30px); font-weight: 900; line-height: 1.3; letter-spacing: -0.02em; color: var(--navy); margin-bottom: 10px; }
+h1 .p { color: var(--purple); }
+h1 .pk { color: var(--pink); }
+
+.body { font-size: clamp(14px,3.5vw,16px); line-height: 1.75; color: var(--navy); }
+.body .p  { color: var(--purple); font-weight: 700; }
+.body .pk { color: var(--pink);   font-weight: 700; }
+.body .r  { color: var(--red);    font-weight: 700; }
+.body .g  { color: var(--green);  font-weight: 700; }
+.body .mu { color: var(--muted); }
+
+.sub { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 6px; }
+
+.card { background: var(--bg-sub); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 15px; margin-bottom: 8px; }
+.card.purple { border-color: var(--purple); border-left-width: 4px; }
+.card.pink   { border-color: var(--pink);   border-left-width: 4px; }
+
+.cond-block {
+  border-radius: 10px; padding: 9px 14px; margin-bottom: 8px;
+  background: var(--bg-sub); border: 1.5px solid var(--border);
+}
+.cond-num {
+  font-size: 11px; font-weight: 900; letter-spacing: 0.12em;
+  color: var(--purple); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;
+}
+.cond-num::before { content: ''; width: 10px; height: 2px; background: var(--purple); display: block; }
+.cond-num.pk { color: var(--pink); }
+.cond-num.pk::before { background: var(--pink); }
+.cond-body { font-size: clamp(13px,3.2vw,15px); line-height: 1.7; color: var(--navy); }
+.cond-body .p  { color: var(--purple); font-weight: 700; }
+.cond-body .pk { color: var(--pink);   font-weight: 700; }
+
+.assoc-block {
+  border-left: 4px solid var(--purple); padding: 10px 13px; margin-bottom: 8px;
+  background: var(--bg-sub); border-radius: 0 10px 10px 0;
+}
+.assoc-block.pk { border-color: var(--pink); }
+.assoc-tag {
+  font-size: 10px; font-weight: 900; letter-spacing: 0.12em;
+  color: var(--purple); margin-bottom: 4px;
+  background: rgba(176,30,255,0.08); border-radius: 4px;
+  display: inline-block; padding: 2px 7px;
+}
+.assoc-tag.pk { color: var(--pink); background: rgba(236,72,153,0.08); }
+.assoc-body { font-size: clamp(13px,3.2vw,15px); line-height: 1.7; color: var(--navy); }
+.assoc-body .p  { color: var(--purple); font-weight: 700; }
+.assoc-body .pk { color: var(--pink);   font-weight: 700; }
+
+.case-row { display: flex; gap: 10px; margin-bottom: 7px; }
+.case-badge { flex-shrink: 0; width: 7px; border-radius: 4px; }
+.case-badge.p  { background: var(--purple); }
+.case-badge.pk { background: var(--pink); }
+.case-inner { flex: 1; }
+.case-cond { font-size: 11px; font-weight: 700; color: var(--purple); letter-spacing: 0.04em; margin-bottom: 3px; }
+.case-cond.pk { color: var(--pink); }
+.case-ans { font-size: clamp(13px,3.3vw,16px); font-weight: 700; color: var(--navy); line-height: 1.5; }
+.case-ans .p  { color: var(--purple); }
+.case-ans .pk { color: var(--pink); }
+
+.graph-wrap { width: 100%; height: 175px; position: relative; border-radius: 12px; overflow: hidden; background: var(--bg-sub); border: 1px solid var(--border); margin: 7px 0; }
+.graph-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.hl-box { background: var(--purple); border-radius: 10px; padding: 10px 15px; margin-top: 6px; margin-bottom: 4px; }
+.hl-box.pink { background: var(--pink); }
+.hl-box span { font-size: clamp(13px,3.3vw,15px); font-weight: 700; color: white; line-height: 1.5; }
+
+.div { height: 1px; background: var(--border); margin: 9px 0; }
+
+.bullets { display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; }
+.bi { display: flex; align-items: flex-start; gap: 9px; }
+.bd { width: 7px; height: 7px; border-radius: 50%; background: var(--purple); flex-shrink: 0; margin-top: 6px; }
+.bt { font-size: clamp(13px,3.3vw,15px); font-weight: 500; color: var(--navy); line-height: 1.65; }
+.bt .p  { color: var(--purple); font-weight: 700; }
+.bt .pk { color: var(--pink);   font-weight: 700; }
+
+/* 字幕 */
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="progress-wrap"><div id="progress-fill"></div></div>
+
+  <div id="header">
+    <div class="logo">Mathrive</div>
+    <div class="slide-num" id="slideNum">1 / 9</div>
+  </div>
+
+  <div id="content">
+    <div id="pause-overlay">
+      <div class="pause-icon">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      </div>
+    </div>
+
+    <!-- S1: フック -->
+    <div class="scene cover" id="s1">
+      <div class="label">なぜ手が止まる？</div>
+      <h1>定義域に<br>文字が入ると<br><span class="p">場合分けが</span><br><span class="pk">わからなくなる</span></h1>
+      <p class="sub" style="margin-top:10px;">解法じゃなく、発想の流れが大事</p>
+    </div>
+
+    <!-- S2: 問題提示 -->
+    <div class="scene" id="s2">
+      <div class="label">問題</div>
+      <div class="card purple">
+        <div class="body">
+          <em>a</em> を正の定数とする。<br>
+          <strong style="font-size:1.05em;color:var(--purple);font-style:italic;">0 ≦ x ≦ a</strong> のとき<br><br>
+          <strong style="font-size:1.05em;font-style:italic;">f</strong><strong style="font-size:1.05em;">(x) = x² − 4x + 5</strong><br><br>
+          の最小値・最大値を求めよ。
+        </div>
+      </div>
+      <div class="hl-box">
+        <span><em>a</em> が変わると<br>軸と定義域の<span style="color:#E4BCFF">位置関係</span>が変わる<br>それが場合分けの正体</span>
+      </div>
+    </div>
+
+    <!-- S3: 基礎確認 -->
+    <div class="scene" id="s3">
+      <div class="label">基礎確認</div>
+      <div class="graph-wrap">
+        <canvas id="gBasic"></canvas>
+      </div>
+      <div id="basicLabel" style="margin-top:8px;font-size:1rem;font-weight:700;color:var(--purple);text-align:center;min-height:1.4em;"></div>
+      <div class="bullets" style="margin-top:4px;">
+        <div class="bi"><div class="bd" style="background:var(--purple)"></div>
+          <div class="bt"><span class="p">最小 = 頂点</span>　軸に一番近い点</div>
+        </div>
+        <div class="bi"><div class="bd" style="background:var(--pink)"></div>
+          <div class="bt"><span class="pk">最大 = 軸から遠い端点</span></div>
+        </div>
+      </div>
+      <p class="sub">この2つが問題全体の土台</p>
+    </div>
+
+    <!-- S4: 情報の整理 -->
+    <div class="scene" id="s4">
+      <div class="label">情報の整理</div>
+      <div class="cond-block">
+        <div class="cond-num">情報 1</div>
+        <div class="cond-body">
+          <em>f</em>(<em>x</em>) = (<em>x</em>−2)²+1<br>
+          → 軸 <span class="p"><em>x</em> = 2</span>、頂点 <span class="p">(2, 1)</span>
+        </div>
+        <div class="sub" style="margin-top:4px;">▶ <span style="color:var(--purple);font-weight:700;">軸の位置</span>がわかる</div>
+      </div>
+      <div class="cond-block">
+        <div class="cond-num">情報 2</div>
+        <div class="cond-body">
+          定義域 0≦<em>x</em>≦<em>a</em> → 端点は <span class="p"><em>x</em>=0 と <em>x</em>=<em>a</em></span><br>
+          軸から遠い方が最大になるから両端の値を出す<br>
+          <em>f</em>(0) = 5　<em>f</em>(<em>a</em>) = <em>a</em>²−4<em>a</em>+5
+        </div>
+        <div class="sub" style="margin-top:4px;">▶ <span style="color:var(--purple);font-weight:700;">最大の候補値</span>が特定できる</div>
+      </div>
+    </div>
+
+    <!-- S5: 最小値 連想 -->
+    <div class="scene" id="s5">
+      <div class="label">最小値　連想</div>
+      <div class="body" style="margin-bottom:8px;">
+        情報 1 → 軸が <em>x</em>=2 にある<br>
+        情報 2 → 定義域の右端が <em>x</em>=<em>a</em><br>
+        合わせると：<strong>軸が定義域に入るかどうかは <em>a</em> 次第</strong>
+      </div>
+      <div class="graph-wrap">
+        <canvas id="gMin"></canvas>
+      </div>
+      <div class="assoc-block">
+        <div class="assoc-tag">連想 1</div>
+        <div class="assoc-body">
+          <span class="p"><em>a</em> &lt; 2</span>　軸が外 → 右端が最小<br>
+          <span class="pk"><em>a</em> ≧ 2</span>　軸が中 → 頂点が最小<br>
+          → 境界は <strong><em>a</em> = 2</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6: 最小値 答案 -->
+    <div class="scene" id="s6">
+      <div class="label">最小値　答案</div>
+      <div class="body" style="margin-bottom:8px;">連想 1 が決まったから方針が立てられる。境界は <strong><em>a</em> = 2</strong> だ。</div>
+      <div class="case-row">
+        <div class="case-badge p"></div>
+        <div class="case-inner">
+          <div class="case-cond">0 &lt; <em>a</em> &lt; 2（軸が外）</div>
+          <div class="case-ans">最小値 = <span class="p"><em>a</em>² − 4<em>a</em> + 5</span>（右端）</div>
+        </div>
+      </div>
+      <div class="case-row">
+        <div class="case-badge pk"></div>
+        <div class="case-inner">
+          <div class="case-cond pk"><em>a</em> ≧ 2（軸が中）</div>
+          <div class="case-ans">最小値 = <span class="pk">1</span>（頂点 <em>x</em>=2）</div>
+        </div>
+      </div>
+      <div class="hl-box" style="margin-top:8px;">
+        <span>場合分けは連想 1 から自然に出てくる</span>
+      </div>
+    </div>
+
+    <!-- S7: 最大値 連想 -->
+    <div class="scene" id="s7">
+      <div class="label pk">最大値　連想</div>
+      <div class="body" style="margin-bottom:8px;">
+        情報 1 → 軸が <em>x</em>=2<br>
+        情報 2 → 端点が <em>x</em>=0 と <em>x</em>=<em>a</em><br>
+        合わせると：<strong>どちらの端点が軸から遠いか</strong>
+      </div>
+      <div class="graph-wrap">
+        <canvas id="gMax"></canvas>
+      </div>
+      <div class="assoc-block pk">
+        <div class="assoc-tag pk">連想 2</div>
+        <div class="assoc-body">
+          <em>x</em>=0 まで距離 <span class="p">2</span>　<em>x</em>=<em>a</em> まで距離 <span class="pk"><em>a</em>−2</span><br>
+          逆転するのは <em>a</em>−2 = 2 → <strong><em>a</em> = 4</strong> が境界
+        </div>
+      </div>
+    </div>
+
+    <!-- S8: 最大値 答案 -->
+    <div class="scene" id="s8">
+      <div class="label pk">最大値　答案</div>
+      <div class="body" style="margin-bottom:8px;">連想 2 が決まったから方針が立てられる。境界は <strong><em>a</em> = 4</strong> だ。</div>
+      <div class="case-row">
+        <div class="case-badge p"></div>
+        <div class="case-inner">
+          <div class="case-cond">0 &lt; <em>a</em> ≦ 4（左端が遠い）</div>
+          <div class="case-ans">最大値 = <span class="p">5</span>（<em>x</em>=0）</div>
+        </div>
+      </div>
+      <div class="case-row">
+        <div class="case-badge pk"></div>
+        <div class="case-inner">
+          <div class="case-cond pk"><em>a</em> &gt; 4（右端が遠い）</div>
+          <div class="case-ans">最大値 = <span class="pk"><em>a</em>² − 4<em>a</em> + 5</span></div>
+        </div>
+      </div>
+      <div class="hl-box pink" style="margin-top:8px;">
+        <span>場合分けは連想 2 から自然に出てくる</span>
+      </div>
+    </div>
+
+    <!-- S9: まとめ -->
+    <div class="scene" id="s9">
+      <div class="label">まとめ</div>
+      <div class="cond-block" style="margin-bottom:10px;">
+        <div class="cond-num">最小値のポイント</div>
+        <div class="cond-body">
+          軸が定義域に<span class="p">入るかどうか</span>で決まる<br>
+          → 境界 <em>a</em>=2 は情報 1 から導ける
+        </div>
+      </div>
+      <div class="cond-block" style="border-color:var(--pink);">
+        <div class="cond-num pk">最大値のポイント</div>
+        <div class="cond-body">
+          端点が軸から<span class="pk">どちらが遠いか</span>で決まる<br>
+          → 境界 <em>a</em>=4 は情報 2 から導ける
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="body">
+        条件を整理して連想するだけ。<br>
+        <span class="p">場合分けは暗記するものじゃなく、条件から導くもの。</span>
+      </div>
+    </div>
+
+    <!-- 字幕オーバーレイ -->
+
+  </div><!-- #content -->
+
+  <div id="footer">
+    <button id="ctrl-btn" aria-label="再生/停止">
+      <svg id="icon-pause" viewBox="0 0 24 24"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      <svg id="icon-play" viewBox="0 0 24 24" style="display:none;"><polygon points="5,3 19,12 5,21"/></svg>
+    </button>
+    <div class="dot-row" id="dots"></div>
+    <div class="account">@Mathrive</div>
+  </div>
+
+</div><!-- #app -->
+
+<script>
+const CC = {
+  purple:'#b01eff', pink:'#EC4899', navy:'#1E1B4B',
+  green:'#059669',  red:'#DC2626',  muted:'#7B72A8',
+  axis:'rgba(30,27,75,0.2)', grid:'rgba(176,30,255,0.06)',
+};
+
+function setup(id){
+  const c=document.getElementById(id);if(!c)return null;
+  const w=c.parentElement,dpr=window.devicePixelRatio||1;
+  const W=w.clientWidth,H=w.clientHeight;
+  c.width=W*dpr;c.height=H*dpr;
+  const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  return{ctx,W,H};
+}
+function cv(wx,wy,xr,yr,W,H){
+  return[(wx-xr[0])/(xr[1]-xr[0])*W, H-(wy-yr[0])/(yr[1]-yr[0])*H];
+}
+function drawAxes(ctx,xr,yr,W,H){
+  ctx.strokeStyle=CC.grid;ctx.lineWidth=0.5;
+  for(let i=0;i<=6;i++){const x=xr[0]+i*(xr[1]-xr[0])/6;const[px]=cv(x,0,xr,yr,W,H);ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();}
+  for(let i=0;i<=5;i++){const y=yr[0]+i*(yr[1]-yr[0])/5;const[,py]=cv(0,y,xr,yr,W,H);ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(W,py);ctx.stroke();}
+  ctx.strokeStyle=CC.axis;ctx.lineWidth=1.5;
+  const[,ay]=cv(0,0,xr,yr,W,H);const[ax]=cv(0,0,xr,yr,W,H);
+  if(ay>0&&ay<H){ctx.beginPath();ctx.moveTo(0,ay);ctx.lineTo(W,ay);ctx.stroke();}
+  if(ax>0&&ax<W){ctx.beginPath();ctx.moveTo(ax,0);ctx.lineTo(ax,H);ctx.stroke();}
+}
+function drawCurve(ctx,fn,x0,x1,xr,yr,W,H,color,lw){
+  ctx.save();ctx.strokeStyle=color||CC.purple;ctx.lineWidth=lw||2.5;
+  ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();
+  const steps=120;
+  for(let i=0;i<=steps;i++){
+    const wx=x0+i*(x1-x0)/steps;
+    const[px,py]=cv(wx,fn(wx),xr,yr,W,H);
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.stroke();ctx.restore();
+}
+function dot(ctx,wx,wy,xr,yr,W,H,color,lbl,above,alpha){
+  const[px,py]=cv(wx,wy,xr,yr,W,H);
+  ctx.save();ctx.globalAlpha=alpha??1;
+  ctx.setLineDash([3,4]);ctx.strokeStyle=color+'55';ctx.lineWidth=1;
+  const[,ay]=cv(0,0,xr,yr,W,H);const[ax]=cv(0,0,xr,yr,W,H);
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,ay);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(ax,py);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(px,py,5,0,2*Math.PI);ctx.fillStyle=color;ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+  if(lbl){ctx.font='bold 10px Noto Sans JP,sans-serif';ctx.fillStyle=color;ctx.textAlign='center';ctx.fillText(lbl,px,above?py-10:py+16);}
+  ctx.restore();
+}
+
+/* ── GRAPH: 基礎確認 ── 4パターン バババッ切り替え ──
+   p=0〜0.25: a=1   軸が外 → 最小=右端, 最大=左端
+   p=0.25〜0.5: a=2  軸が境界 → 最小=頂点, 最大=左端
+   p=0.5〜0.75: a=4  最大の境界 → 最小=頂点, 最大=両端
+   p=0.75〜1.0: a=5.5 軸が中・右端遠い → 最小=頂点, 最大=右端
+*/
+const BASIC_CASES=[
+  {a:1,   minX:1,   maxX:0,   desc:'a=1　軸が外 → 最小は右端'},
+  {a:2,   minX:2,   maxX:0,   desc:'a=2　軸がちょうど端 → 最小は頂点'},
+  {a:4,   minX:2,   maxX:0,   desc:'a=4　最大の境界 → 両端が同じ値'},
+  {a:5.5, minX:2,   maxX:5.5, desc:'a=5.5　右端が遠い → 最大は右端'},
+];
+const basicLabelEl=document.getElementById('basicLabel');
+
+function gBasicDraw(p){
+  const r=setup('gBasic');if(!r)return;
+  const{ctx,W,H}=r,fn=x=>x*x-4*x+5,xr=[-0.3,6.8],yr=[-0.3,9];
+  ctx.clearRect(0,0,W,H);
+  drawAxes(ctx,xr,yr,W,H);
+
+  const phase=Math.min(Math.floor(p/0.25),3);
+  const localP=(p-phase*0.25)/0.25;
+  const fadeIn=Math.min(localP/0.15,1);
+  const cs=BASIC_CASES[phase];
+
+  // 定義域ゾーン
+  ctx.save();ctx.globalAlpha=fadeIn*0.12;
+  const[z0]=cv(0,0,xr,yr,W,H);const[z1]=cv(cs.a,0,xr,yr,W,H);
+  ctx.fillStyle=CC.purple;ctx.fillRect(z0,0,z1-z0,H);ctx.restore();
+
+  // フル曲線（薄）
+  ctx.save();ctx.globalAlpha=0.15;
+  drawCurve(ctx,fn,-0.3,6.8,xr,yr,W,H,'#9CA3AF',1.5);ctx.restore();
+
+  // 定義域内曲線
+  ctx.save();ctx.globalAlpha=fadeIn;
+  drawCurve(ctx,fn,0,cs.a,xr,yr,W,H,CC.purple,3);ctx.restore();
+
+  // 軸の破線
+  const[axL]=cv(2,0,xr,yr,W,H);
+  ctx.save();ctx.globalAlpha=fadeIn*0.5;
+  ctx.setLineDash([4,4]);ctx.strokeStyle=CC.muted+'88';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(axL,0);ctx.lineTo(axL,H);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  ctx.save();ctx.globalAlpha=fadeIn*0.8;
+  ctx.font='bold 9px Noto Sans JP';ctx.fillStyle=CC.muted;ctx.textAlign='center';
+  ctx.fillText('x=2',axL,11);ctx.restore();
+
+  // a ラベル
+  const[aX]=cv(cs.a,0,xr,yr,W,H);
+  const[,base]=cv(0,yr[0],xr,yr,W,H);
+  ctx.save();ctx.globalAlpha=fadeIn;
+  ctx.font='bold 10px Noto Sans JP';ctx.fillStyle=CC.purple;ctx.textAlign='center';
+  ctx.fillText('a='+cs.a,aX,base-4);ctx.restore();
+
+  // 最小・最大の点
+  const dotFade=Math.min((localP-0.12)/0.25,1);
+  if(dotFade>0){
+    dot(ctx,cs.minX,fn(cs.minX),xr,yr,W,H,CC.purple,'最小',true,dotFade);
+    dot(ctx,cs.maxX,fn(cs.maxX),xr,yr,W,H,CC.pink,'最大',false,dotFade);
+    if(cs.a===4){ dot(ctx,4,fn(4),xr,yr,W,H,CC.pink,'最大',false,dotFade); }
+  }
+
+  if(basicLabelEl) basicLabelEl.textContent=cs.desc;
+}
+
+/* ── GRAPH: 最小値 連想 ── */
+// 2フェーズ: p=0〜0.5 case a<2 (a=1.2), p=0.5〜1 case a≧2 (a=3)
+function gMinDraw(p){
+  const r=setup('gMin');if(!r)return;
+  const{ctx,W,H}=r,fn=x=>x*x-4*x+5,xr=[-0.3,4],yr=[0,8];
+  ctx.clearRect(0,0,W,H);
+  drawAxes(ctx,xr,yr,W,H);
+
+  const phase=p<0.5?0:1;
+  const localP=phase===0?p/0.5:(p-0.5)/0.5;
+  const alpha=Math.min(localP/0.2,1);
+  const aVal=phase===0?1.2:3;
+
+  // domain zone
+  ctx.save();ctx.globalAlpha=alpha*0.12;
+  const[z0]=cv(0,0,xr,yr,W,H);const[z1]=cv(aVal,0,xr,yr,W,H);
+  ctx.fillStyle=CC.purple;ctx.fillRect(z0,0,z1-z0,H);ctx.restore();
+
+  // 全曲線（薄）
+  ctx.save();ctx.globalAlpha=0.12;
+  drawCurve(ctx,fn,-0.3,4,xr,yr,W,H,'#9CA3AF',2);ctx.restore();
+
+  // 定義域内曲線
+  ctx.save();ctx.globalAlpha=alpha;
+  drawCurve(ctx,fn,0,aVal,xr,yr,W,H,CC.purple,3);ctx.restore();
+
+  // 軸破線
+  ctx.save();ctx.globalAlpha=alpha*0.6;
+  ctx.setLineDash([4,4]);ctx.strokeStyle=CC.muted+'88';ctx.lineWidth=1;
+  const[axL]=cv(2,0,xr,yr,W,H);ctx.beginPath();ctx.moveTo(axL,0);ctx.lineTo(axL,H);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  ctx.save();ctx.globalAlpha=alpha*0.8;
+  ctx.font='bold 9px Noto Sans JP';ctx.fillStyle=CC.muted;ctx.textAlign='center';
+  ctx.fillText('x=2',axL,11);ctx.restore();
+
+  // a 値ラベル
+  const[aX]=cv(aVal,0,xr,yr,W,H);
+  const[,base]=cv(0,yr[0],xr,yr,W,H);
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.font='bold 10px Noto Sans JP';ctx.fillStyle=CC.purple;ctx.textAlign='center';
+  ctx.fillText('a='+aVal,aX,base-4);ctx.restore();
+
+  const dotFade=Math.min((localP-0.1)/0.3,1);
+  if(dotFade>0){
+    if(phase===0){
+      // a<2: 軸が外、右端が最小
+      dot(ctx,aVal,fn(aVal),xr,yr,W,H,CC.purple,'最小',true,dotFade);
+      // case label
+      ctx.save();ctx.globalAlpha=dotFade;
+      ctx.font='bold 10px Noto Sans JP';ctx.fillStyle=CC.purple;ctx.textAlign='left';
+      ctx.fillText('軸が外',axL+5,22);ctx.restore();
+    } else {
+      // a≧2: 軸が中、頂点が最小
+      dot(ctx,2,fn(2),xr,yr,W,H,CC.pink,'最小',true,dotFade);
+      ctx.save();ctx.globalAlpha=dotFade;
+      ctx.font='bold 10px Noto Sans JP';ctx.fillStyle=CC.pink;ctx.textAlign='left';
+      ctx.fillText('軸が中',axL+5,22);ctx.restore();
+    }
+  }
+}
+
+/* ── GRAPH: 最大値 連想 ── */
+// 距離を視覚化: x=0まで距離2、x=aまで距離a-2
+// animate a from 1 to 5.5, show crossing at a=4
+function gMaxDraw(p){
+  const r=setup('gMax');if(!r)return;
+  const{ctx,W,H}=r,fn=x=>x*x-4*x+5,xr=[-0.3,6],yr=[0,15];
+  ctx.clearRect(0,0,W,H);
+  drawAxes(ctx,xr,yr,W,H);
+
+  // a animates: 1.0 → 5.5 over p=0..0.7, then freeze at 5.5
+  const aVal=1.0+Math.min(p/0.7,1)*4.5;
+  const alpha=Math.min(p/0.2,1);
+
+  // domain zone
+  ctx.save();ctx.globalAlpha=alpha*0.1;
+  const[z0]=cv(0,0,xr,yr,W,H);const[z1]=cv(aVal,0,xr,yr,W,H);
+  ctx.fillStyle=CC.purple;ctx.fillRect(z0,0,z1-z0,H);ctx.restore();
+
+  // 全曲線（薄）
+  ctx.save();ctx.globalAlpha=0.12;
+  drawCurve(ctx,fn,-0.3,6,xr,yr,W,H,'#9CA3AF',2);ctx.restore();
+
+  // 定義域内曲線
+  ctx.save();ctx.globalAlpha=alpha;
+  drawCurve(ctx,fn,0,aVal,xr,yr,W,H,CC.purple,3);ctx.restore();
+
+  // 軸破線
+  ctx.save();ctx.globalAlpha=alpha*0.5;
+  ctx.setLineDash([4,4]);ctx.strokeStyle=CC.muted+'88';ctx.lineWidth=1;
+  const[axL]=cv(2,0,xr,yr,W,H);ctx.beginPath();ctx.moveTo(axL,0);ctx.lineTo(axL,H);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  ctx.save();ctx.globalAlpha=alpha*0.7;
+  ctx.font='bold 9px Noto Sans JP';ctx.fillStyle=CC.muted;ctx.textAlign='center';
+  ctx.fillText('x=2',axL,11);ctx.restore();
+
+  // 境界 a=4 の縦線
+  if(p>0.4){
+    const fade4=Math.min((p-0.4)/0.2,1);
+    ctx.save();ctx.globalAlpha=fade4*0.4;
+    ctx.setLineDash([6,4]);ctx.strokeStyle=CC.pink;ctx.lineWidth=1.5;
+    const[b4X]=cv(4,0,xr,yr,W,H);ctx.beginPath();ctx.moveTo(b4X,0);ctx.lineTo(b4X,H);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+    const[,base]=cv(0,yr[0],xr,yr,W,H);
+    ctx.save();ctx.globalAlpha=fade4;
+    ctx.font='bold 10px Noto Sans JP';ctx.fillStyle=CC.pink;ctx.textAlign='center';
+    ctx.fillText('a=4',b4X,base-4);ctx.restore();
+  }
+
+  // 距離表示
+  const dotFade=Math.min((p-0.15)/0.3,1);
+  if(dotFade>0){
+    // 左端 f(0)
+    const leftColor=aVal<=4?CC.purple:CC.muted;
+    dot(ctx,0,fn(0),xr,yr,W,H,leftColor,'f(0)',false,dotFade);
+    // 右端 f(a)
+    const rightColor=aVal>4?CC.pink:CC.muted;
+    dot(ctx,aVal,fn(aVal),xr,yr,W,H,rightColor,'f(a)',false,dotFade);
+
+    // 最大ラベル
+    if(aVal<=4){
+      ctx.save();ctx.globalAlpha=dotFade;
+      ctx.font='bold 9px Noto Sans JP';ctx.fillStyle=CC.purple;ctx.textAlign='center';
+      const[px,py]=cv(0,fn(0),xr,yr,W,H);ctx.fillText('← 最大',px+28,py-8);ctx.restore();
+    } else {
+      ctx.save();ctx.globalAlpha=dotFade;
+      ctx.font='bold 9px Noto Sans JP';ctx.fillStyle=CC.pink;ctx.textAlign='center';
+      const[px,py]=cv(aVal,fn(aVal),xr,yr,W,H);ctx.fillText('最大 →',px-28,py-8);ctx.restore();
+    }
+  }
+}
+
+/* ── 字幕データ ── */
+
+/* ── CONTROLLER ── */
+// S1:7s S2:8s S3:11s S4:10s S5:10s S6:11s S7:10s S8:11s S9:17s = 95s
+const SLIDES=['s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+const DUR=[7000,8000,11000,10000,10000,11000,10000,11000,17000];
+const TOTAL=DUR.reduce((a,b)=>a+b,0);
+
+let cur=0,tStart=null,rafId=null,paused=false,pausedAt=0,gRafs=[];
+
+const progFill=document.getElementById('progress-fill');
+const slideNumEl=document.getElementById('slideNum');
+const overlay=document.getElementById('pause-overlay');
+const iconPause=document.getElementById('icon-pause');
+const iconPlay=document.getElementById('icon-play');
+
+const dotsEl=document.getElementById('dots');
+SLIDES.forEach((_,i)=>{
+  const d=document.createElement('div');d.className='dot';
+  d.addEventListener('click',()=>jumpTo(i));
+  dotsEl.appendChild(d);
+});
+const dotEls=dotsEl.querySelectorAll('.dot');
+
+function stopGraphAnims(){gRafs.forEach(r=>cancelAnimationFrame(r));gRafs=[];}
+function animGraph(fn,dur){
+  let t0=null;
+  function step(ts){if(!t0)t0=ts;const p=Math.min((ts-t0)/dur,1);fn(p);if(p<1)gRafs.push(requestAnimationFrame(step));}
+  gRafs.push(requestAnimationFrame(step));
+}
+
+function showSlide(idx){
+  SLIDES.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.remove('active','exit');
+    if(i<idx)el.classList.add('exit');
+    if(i===idx)el.classList.add('active');
+  });
+  dotEls.forEach((d,i)=>d.classList.toggle('on',i===idx));
+  slideNumEl.textContent=`${idx+1} / ${SLIDES.length}`;
+  stopGraphAnims();
+  if(idx===2)animGraph(gBasicDraw,DUR[2]-500);
+  if(idx===4)animGraph(gMinDraw,DUR[4]-500);
+  if(idx===6)animGraph(gMaxDraw,DUR[6]-500);
+}
+
+function tick(ts){
+  if(paused)return;
+  if(!tStart)tStart=ts;
+  const el=ts-tStart;
+  progFill.style.width=`${Math.min(el/TOTAL*100,100)}%`;
+  let next=SLIDES.length-1,acc=0;
+  for(let i=0;i<DUR.length;i++){acc+=DUR[i];if(el<acc){next=i;break;}}
+  if(next!==cur){cur=next;showSlide(cur);}
+  let slideStart=0;for(let i=0;i<cur;i++)slideStart+=DUR[i];
+  if(el<TOTAL)rafId=requestAnimationFrame(tick);
+  else progFill.style.width='100%';
+}
+
+function setPlayUI(playing){
+  iconPause.style.display=playing?'':'none';
+  iconPlay.style.display=playing?'none':'';
+  overlay.classList.toggle('show',!playing);
+}
+
+document.getElementById('ctrl-btn').addEventListener('click',e=>{
+  e.stopPropagation();
+  if(paused){paused=false;tStart=performance.now()-pausedAt;setPlayUI(true);rafId=requestAnimationFrame(tick);}
+  else{paused=true;pausedAt=performance.now()-tStart;setPlayUI(false);}
+});
+
+function jumpTo(idx){
+  let acc=0;for(let i=0;i<idx;i++)acc+=DUR[i];
+  tStart=performance.now()-acc;pausedAt=acc;
+  cur=idx;showSlide(idx);
+  progFill.style.width=`${acc/TOTAL*100}%`;
+  if(!paused)rafId=requestAnimationFrame(tick);
+}
+
+document.getElementById('progress-wrap').addEventListener('click',e=>{
+  const rect=e.currentTarget.getBoundingClientRect();
+  const ratio=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+  const target=ratio*TOTAL;
+  tStart=performance.now()-target;pausedAt=target;
+  let next=SLIDES.length-1,acc=0;
+  for(let i=0;i<DUR.length;i++){acc+=DUR[i];if(target<acc){next=i;break;}}
+  cur=next;showSlide(cur);
+  progFill.style.width=`${ratio*100}%`;
+  if(!paused)rafId=requestAnimationFrame(tick);
+});
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{showSlide(0);setPlayUI(true);rafId=requestAnimationFrame(tick);},200);
+});
+</script>
+</body>
+</html>
